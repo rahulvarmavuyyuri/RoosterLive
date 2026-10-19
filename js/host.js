@@ -12,6 +12,10 @@
   let byId = {};
   let peer = null;
   const viewers = new Map(); // peerId -> { conn, lastMsg }
+  let autoMode = false; // camera page: first live phone becomes the main phone
+  let notMain = false;  // camera page: another phone is already the main phone
+  let camLive = false;
+  let claimTimer = null;
   let passKey = "";
   try { passKey = localStorage.getItem("farm-viewer-pass") || ""; } catch { /* ignore */ }
   if ($("h-pass")) $("h-pass").value = passKey;
@@ -55,6 +59,7 @@
 
   // ---------- Spotlight ----------
   function setSpotlight(birdId) {
+    if (notMain) { status("Another phone is the main phone. Change who's on camera from that phone."); return; }
     const camera = $("spot-cam").value || null;
     state.spotlight = { bird: birdId, camera: birdId ? camera : null };
     save();
@@ -127,7 +132,8 @@
   function goOnline() {
     peer = new Peer(ids.hub(), { config: { iceServers: cfg.iceServers } });
     peer.on("open", () => {
-      status("Online. Viewers can chat and see who's in the spotlight.", "ok");
+      notMain = false;
+      status(autoMode ? "This is the main phone. Use the On camera tab to show who's on camera." : "Online. Viewers can chat and see who's in the spotlight.", "ok");
       $("chat-text").disabled = false;
       $("chat-send").disabled = false;
       updateCount();
@@ -139,7 +145,15 @@
     });
     peer.on("error", (err) => {
       if (err.type === "unavailable-id") {
-        status("The host page is already open on another device or tab. Close it there, then reload this page.", "err");
+        if (autoMode) {
+          notMain = true;
+          status("Another phone is the main phone. Change who's on camera from that phone.");
+          // If the main phone stops, this phone takes over.
+          clearTimeout(claimTimer);
+          claimTimer = setTimeout(() => { if (camLive && !peer) goOnline(); }, 15000);
+        } else {
+          status("The host page is already open on another device or tab. Close it there, then reload this page.", "err");
+        }
         peer.destroy();
         peer = null;
       } else if (err.type !== "peer-unavailable") {
@@ -184,44 +198,22 @@
     $("viewer-count").textContent = "";
   }
 
-  const toggle = $("host-toggle");
-  if (toggle) {
-    // Combined camera + host page: the switch decides if this phone is the host.
-    // It uses the same viewer password as the camera on this page.
-    const passInput = $("pass");
-    function setHost(on) {
-      if (on) {
-        const pass = (passInput && passInput.value.trim()) || passKey;
-        if (pass.length < 4) {
-          toggle.checked = false;
-          status("Set the viewer password above first (at least 4 characters).", "err");
-          if (passInput) passInput.focus();
-          return;
-        }
-        passKey = pass;
-        try { localStorage.setItem("farm-viewer-pass", pass); localStorage.setItem("host-on", "1"); } catch { /* ignore */ }
-        if (!peer && typeof Peer !== "undefined") { status("Connecting…"); goOnline(); }
-      } else {
-        try { localStorage.setItem("host-on", "0"); } catch { /* ignore */ }
-        goOffline();
-        status("Off. Turn this on for one phone so viewers get chat and the spotlight.");
-      }
-    }
-    toggle.addEventListener("change", () => setHost(toggle.checked));
-    // Keep the host password in step if it's changed on this page.
-    if (passInput) passInput.addEventListener("change", () => {
-      const pass = passInput.value.trim();
-      if (peer && pass.length >= 4 && pass !== passKey) {
-        passKey = pass;
-        try { localStorage.setItem("farm-viewer-pass", pass); } catch { /* ignore */ }
-        for (const v of viewers.values()) v.conn.close();
-      }
+  if (!$("h-pass")) {
+    // Camera page: the first phone that goes live becomes the main phone and
+    // runs the spotlight. It uses the same viewer password as its camera.
+    autoMode = true;
+    window.addEventListener("farmcam:live", (e) => {
+      passKey = (e.detail && e.detail.pass) || passKey;
+      camLive = true;
+      notMain = false;
+      if (!peer && typeof Peer !== "undefined") goOnline();
     });
-    let wasOn = false;
-    try { wasOn = localStorage.getItem("host-on") === "1"; } catch { /* ignore */ }
-    toggle.checked = wasOn;
-    if (typeof Peer === "undefined") status("The streaming library didn't load. Check your connection and reload.", "err");
-    else setHost(wasOn);
+    window.addEventListener("farmcam:stopped", () => {
+      camLive = false;
+      clearTimeout(claimTimer);
+      goOffline();
+      status("Not live.");
+    });
   } else {
     $("h-pass-save").addEventListener("click", () => {
       const pass = $("h-pass").value.trim();

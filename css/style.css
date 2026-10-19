@@ -252,3 +252,17 @@ dialog.photo-view form { text-align: right; }
 .switch input { width: 22px; height: 22px; accent-color: var(--comb); }
 .ops > div > .panel, .ops > .side > .panel { margin-top: 0; }
 .ops > div:first-child { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+
+/* ---------- Camera page: one video + tabs ---------- */
+.studio { max-width: 760px; padding-bottom: 60px; display: flex; flex-direction: column; gap: 14px; }
+.studio .screen { margin: 0; }
+.tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding: 6px 0; }
+.tabs [role="tab"] { appearance: none; border: 2px solid var(--ink); background: var(--panel); color: var(--ink); border-radius: 10px; padding: 10px 6px; font: 700 0.95rem/1.15 var(--display); cursor: pointer; }
+.tabs [role="tab"][aria-selected="true"] { background: var(--comb); border-color: var(--comb); color: #fff; }
+.pane { background: var(--panel); border: 2px solid var(--ink); border-radius: 12px; padding: 16px; }
+.pane > h2 { margin: 0 0 12px; font-family: var(--display); font-size: 1.35rem; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.pane.manage-body { display: block; }
+.pane.manage-body > * + * { margin-top: 18px; }
+.main-phone { margin-top: 16px; padding-top: 12px; border-top: 2px solid var(--edge); }
+.main-phone .status-line { margin-bottom: 4px; }
+@media (max-width: 420px) { .tabs [role="tab"] { font-size: 0.85rem; padding: 9px 4px; } }

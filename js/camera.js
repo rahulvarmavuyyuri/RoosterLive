@@ -207,6 +207,7 @@
     status("Connecting to the stream server…");
     peer = new Peer(ids.camera(slot), { config: { iceServers: cfg.iceServers } });
     peer.on("open", () => {
+      window.dispatchEvent(new CustomEvent("farmcam:live", { detail: { pass: passKey } }));
       setLive(true);
       status(`You're live as ${label}.`, "ok");
       updateCount();
@@ -241,6 +242,7 @@
     passInput.disabled = false;
     shared.length = 0;
     renderShared();
+    window.dispatchEvent(new Event("farmcam:stopped"));
     setLive(false);
     if (keepStatus !== true) status("Camera stopped.");
   }

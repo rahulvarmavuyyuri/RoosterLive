@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Camera and host — RoosterLive</title>
+  <title>Farm camera — RoosterLive</title>
   <meta name="robots" content="noindex">
   <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,13 +14,12 @@
 <body>
   <header class="sign">
     <div class="wrap">
-      <h1>Camera and host</h1>
+      <h1>Farm camera</h1>
       <p><a href="./">Viewer page</a></p>
     </div>
   </header>
 
-  <main class="wrap ops">
-    <div>
+  <main class="wrap studio">
       <div class="screen">
         <video id="preview" playsinline autoplay muted></video>
         <div class="badge-row">
@@ -32,32 +31,16 @@
             <h2>Camera is off</h2>
             <p>Point this phone at its spot on the farm, choose the spot, then go live.</p>
           </div>
-        </div>
-      </div>
 
-      <section class="panel" aria-labelledby="spot-title">
-        <header>
-          <h2 id="spot-title">Who's on camera?</h2>
-          <span class="meta" id="spot-meta">Nobody in the spotlight</span>
-        </header>
-        <div class="panel-body">
-          <div class="field">
-            <label for="spot-cam">Camera they're on</label>
-            <select id="spot-cam"></select>
-            <p class="hint">Viewers who haven't picked a camera themselves switch to this one.</p>
-          </div>
-          <div class="pick-grid" id="picks"></div>
-          <div class="row" style="margin-top:14px">
-            <button class="btn" id="clear" type="button">Clear spotlight</button>
-          </div>
-        </div>
-      </section>
-    </div>
+    <nav class="tabs" role="tablist" aria-label="Camera page sections">
+      <button role="tab" type="button" id="tab-live" aria-controls="pane-live" aria-selected="true">Go live</button>
+      <button role="tab" type="button" id="tab-spot" aria-controls="pane-spot" aria-selected="false">On camera</button>
+      <button role="tab" type="button" id="tab-photos" aria-controls="pane-photos" aria-selected="false">Photos</button>
+      <button role="tab" type="button" id="tab-birds" aria-controls="pane-birds" aria-selected="false">My birds</button>
+    </nav>
 
-    <div class="side">
-      <section class="panel" aria-labelledby="cam-title">
-        <header><h2 id="cam-title">This camera</h2></header>
-        <div class="panel-body">
+    <section class="pane" role="tabpanel" id="pane-live" aria-labelledby="tab-live">
+
           <p class="status-line" id="status-line">Ready when you are.</p>
           <div class="field">
             <label for="pass">Viewer password</label>
@@ -87,43 +70,29 @@
             <button class="btn" id="mic" type="button" disabled>Mute sound</button>
           </div>
           <p class="hint">Keep this page open with the screen on, and plug the phone into power.</p>
+        <div class="main-phone">
+          <p class="status-line" id="h-status">Not live.</p>
+          <p class="hint">The first phone that goes live is the <b>main phone</b>: it also runs the "On camera" spotlight. Other phones just stream. <span id="viewer-count"></span></p>
         </div>
-      </section>
+    </section>
 
-      <section class="panel" aria-labelledby="host-title">
-        <header>
-          <h2 id="host-title">Host</h2>
-          <span class="meta" id="viewer-count"></span>
-        </header>
-        <div class="panel-body">
-          <label class="switch" for="host-toggle">
-            <input type="checkbox" id="host-toggle">
-            <span>Run chat and spotlight from this phone</span>
-          </label>
-          <p class="hint">Turn this on for one phone only. It uses the viewer password above.</p>
-          <p class="status-line" id="h-status">Off.</p>
-        </div>
-      </section>
+    <section class="pane" role="tabpanel" id="pane-spot" aria-labelledby="tab-spot" hidden>
+      <h2>Who's on camera? <span class="meta" id="spot-meta">Nobody in the spotlight</span></h2>
 
-      <section class="panel chat" aria-labelledby="chat-title" hidden>
-        <header><h2 id="chat-title">Yard chat</h2></header>
-        <ul class="chat-log" id="chat-log" aria-live="polite"></ul>
-        <p class="chat-empty" id="chat-empty">Viewer messages show up here.</p>
-        <form id="chat-form" autocomplete="off">
-          <div class="name-field">
-            <label class="visually-hidden" for="chat-name">Host name</label>
-            <input type="text" id="chat-name" placeholder="Host name" maxlength="24" value="Farm" required>
+          <div class="field">
+            <label for="spot-cam">Camera they're on</label>
+            <select id="spot-cam"></select>
+            <p class="hint">Viewers who haven't picked a camera themselves switch to this one.</p>
           </div>
-          <label class="visually-hidden" for="chat-text">Message</label>
-          <input type="text" id="chat-text" placeholder="Write to viewers" maxlength="280" required disabled>
-          <button class="btn primary" type="submit" id="chat-send" disabled>Send</button>
-        </form>
-      </section>
-    </div>
+          <div class="pick-grid" id="picks"></div>
+          <div class="row" style="margin-top:14px">
+            <button class="btn" id="clear" type="button">Clear spotlight</button>
+          </div>
+    </section>
 
-    <section class="panel share" aria-labelledby="share-title">
-      <header><h2 id="share-title">Share a photo</h2><span class="meta" id="share-count"></span></header>
-      <div class="panel-body">
+    <section class="pane" role="tabpanel" id="pane-photos" aria-labelledby="tab-photos" hidden>
+      <h2>Share a photo <span class="meta" id="share-count"></span></h2>
+
         <div class="field">
           <label for="share-caption">Caption (optional)</label>
           <input type="text" id="share-caption" maxlength="80" autocomplete="off" placeholder="e.g. Pingala after his morning bath">
@@ -136,11 +105,11 @@
         <p class="hint">Photos go to friends watching right now, and to anyone who joins while this camera is live. They disappear when you stop the camera.</p>
         <p class="status-line" id="share-status" hidden></p>
         <ul class="shared-list" id="share-list"></ul>
-      </div>
     </section>
-    <section class="panel manage" aria-labelledby="manage-title">
-      <header><h2 id="manage-title">Manage the flock</h2><span class="meta" id="m-count"></span></header>
-      <div class="panel-body manage-body">
+
+    <section class="pane manage-body" role="tabpanel" id="pane-birds" aria-labelledby="tab-birds" hidden>
+      <h2>My birds <span class="meta" id="m-count"></span></h2>
+
         <div class="manage-key">
           <h3>GitHub key</h3>
           <p class="hint">The host page needs a key to save birds to your site. It stays only on this device.</p>
@@ -212,8 +181,22 @@
           <h3>Birds on the site</h3>
           <ul class="shared-list" id="m-list"></ul>
         </div>
-      </div>
     </section>
+
+      <section class="panel chat" aria-labelledby="chat-title" hidden>
+        <header><h2 id="chat-title">Yard chat</h2></header>
+        <ul class="chat-log" id="chat-log" aria-live="polite"></ul>
+        <p class="chat-empty" id="chat-empty">Viewer messages show up here.</p>
+        <form id="chat-form" autocomplete="off">
+          <div class="name-field">
+            <label class="visually-hidden" for="chat-name">Host name</label>
+            <input type="text" id="chat-name" placeholder="Host name" maxlength="24" value="Farm" required>
+          </div>
+          <label class="visually-hidden" for="chat-text">Message</label>
+          <input type="text" id="chat-text" placeholder="Write to viewers" maxlength="280" required disabled>
+          <button class="btn primary" type="submit" id="chat-send" disabled>Send</button>
+        </form>
+      </section>
   </main>
 
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -222,5 +205,6 @@
   <script src="js/chat-ui.js"></script>
   <script src="js/host.js"></script>
   <script src="js/manage.js"></script>
+  <script src="js/tabs.js"></script>
 </body>
 </html>
