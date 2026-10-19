@@ -1,30 +1,34 @@
 [
   {
     "id": "rooster-1",
-    "name": "Rooster 1",
-    "breed": "Breed to be added",
+    "name": "Pingala",
+    "breed": "Red-brown plumage",
     "about": "Deep mahogany-red feathers with darker wings, a small pea comb and a tall, upright stance.",
-    "photo": "images/flock/rooster-1.jpg"
+    "photo": "images/flock/rooster-1.jpg",
+    "nameTe": "పింగళ"
   },
   {
     "id": "rooster-2",
-    "name": "Rooster 2",
-    "breed": "Breed to be added",
-    "about": "Golden hackles finely streaked with brown, and a bright red face.",
-    "photo": "images/flock/rooster-2.jpg"
+    "name": "Dega",
+    "breed": "Hawk-streaked plumage",
+    "about": "Golden hackles finely streaked with brown like a hawk's feathers, and a bright red face.",
+    "photo": "images/flock/rooster-2.jpg",
+    "nameTe": "డేగ"
   },
   {
     "id": "rooster-3",
-    "name": "Rooster 3",
-    "breed": "Breed to be added",
+    "name": "Nemali",
+    "breed": "Showy laced plumage",
     "about": "Straw-gold hackles over black-and-white laced body feathers, here showing off a full wing stretch.",
-    "photo": "images/flock/rooster-3.jpg"
+    "photo": "images/flock/rooster-3.jpg",
+    "nameTe": "నెమలి"
   },
   {
     "id": "rooster-4",
-    "name": "Rooster 4",
-    "breed": "Breed to be added",
-    "about": "Glossy black body with a long straw-gold hackle and pale legs.",
-    "photo": "images/flock/rooster-4.jpg"
+    "name": "Kaki Dega",
+    "breed": "Black body, golden neck",
+    "about": "Glossy crow-black body with a long straw-gold hackle and pale legs.",
+    "photo": "images/flock/rooster-4.jpg",
+    "nameTe": "కాకి డేగ"
   }
 ]

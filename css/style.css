@@ -187,3 +187,6 @@ html[data-bg]:not([data-bg="none"]) .day { background: color-mix(in srgb, var(--
 .gate-card p { margin: 0; }
 .gate-card input { width: 100%; font: inherit; color: var(--ink); background: var(--bg); border: 2px solid var(--muted); border-radius: 6px; padding: 10px 12px; }
 .gate-error { color: var(--comb); font-weight: 700; }
+
+/* Telugu names next to the English ones */
+.name-te { font-family: "Noto Sans Telugu", var(--body); font-weight: 600; font-size: 0.8em; color: var(--muted); }

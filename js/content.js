@@ -36,7 +36,7 @@
       const details = [["Age", b.age], ["Weight", b.weight], ["Comb", b.comb], ["Bloodline", b.bloodline]].filter(([, v]) => v);
       return el("li", { className: "bird" },
         el("img", { src: b.photo, alt: `${b.name}, ${b.breed}`, loading: "lazy" }),
-        el("h3", {}, el("span", { textContent: b.name }), tag),
+        el("h3", {}, el("span", { textContent: b.name }), b.nameTe ? el("span", { className: "name-te", lang: "te", textContent: b.nameTe }) : null, tag),
         b.breed ? el("p", { className: "breed", textContent: b.breed }) : null,
         b.about ? el("p", { textContent: b.about }) : null,
         el("dl", {}, ...details.flatMap(([k, v]) => [el("dt", { textContent: k }), el("dd", { textContent: v })])),
@@ -87,7 +87,7 @@
     spot.replaceChildren(
       el("img", { src: b.photo, alt: "" }),
       el("div", {},
-        el("h3", { textContent: b.name }),
+        el("h3", {}, b.name, b.nameTe ? el("span", { className: "name-te", lang: "te", textContent: " " + b.nameTe }) : null),
         el("p", { className: "breed", textContent: [b.breed, b.age].filter(Boolean).join(", ") }),
         b.about ? el("p", { textContent: b.about }) : null)
     );
