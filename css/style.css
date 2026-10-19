@@ -187,3 +187,11 @@ html[data-bg]:not([data-bg="none"]) .day { background: color-mix(in srgb, var(--
 .gate-card p { margin: 0; }
 .gate-card input { width: 100%; font: inherit; color: var(--ink); background: var(--bg); border: 2px solid var(--muted); border-radius: 6px; padding: 10px 12px; }
 .gate-error { color: var(--comb); font-weight: 700; }
+
+/* Photo shown in the video tile until a camera goes live */
+.screen-overlay.poster {
+  background:
+    linear-gradient(rgb(0 0 0 / 0.25), rgb(0 0 0 / 0.6)),
+    url("../images/flock/rooster-3.jpg") center 30% / cover no-repeat;
+  text-shadow: 0 2px 8px rgb(0 0 0 / 0.6);
+}
