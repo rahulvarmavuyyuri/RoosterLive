@@ -3,50 +3,39 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Raceway Live — RC racing, live</title>
-  <meta name="description" content="Watch RC car races live from every corner of the track, with live lap times and chat.">
+  <title>RoosterLive — our roosters, live</title>
+  <meta name="description" content="Watch our roosters live from the farm, meet the flock and chat with other viewers.">
   <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&family=Big+Shoulders+Display:wght@800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;700&family=Rye&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header class="masthead">
+  <header class="sign">
     <div class="wrap">
-      <h1 data-site-name>Raceway Live</h1>
-      <p>Live from <span data-track-name>the track</span></p>
+      <h1 data-site-name>RoosterLive</h1>
+      <p>Live from <span data-farm-name>the farm</span></p>
     </div>
-    <div class="kerb" aria-hidden="true"></div>
   </header>
 
   <main>
     <div class="wrap stage">
-      <div class="stage-main">
+      <div>
         <div class="cam-tabs" id="cam-tabs" role="group" aria-label="Choose a camera"></div>
-
         <div class="screen" id="screen">
           <video id="video" playsinline autoplay muted></video>
-
           <div class="badge-row">
             <span class="badge" id="status-badge">Offline</span>
             <span class="badge" id="viewer-badge" hidden></span>
           </div>
-
           <div class="screen-overlay" id="overlay">
             <div>
               <h2 id="overlay-title">Finding the cameras…</h2>
-              <p id="overlay-text">Connecting to the track.</p>
+              <p id="overlay-text">Connecting to the farm.</p>
             </div>
           </div>
-
-          <div class="hud" id="hud" hidden>
-            <span class="hud-flag" id="hud-flag">Racing</span>
-            <span id="hud-race"></span>
-            <span id="hud-laps"></span>
-            <span id="hud-clock">0:00.0</span>
-          </div>
-
+          <div class="caption" id="caption" hidden></div>
           <div class="screen-controls">
             <button class="btn small" id="unmute" type="button" hidden>Turn sound on</button>
             <button class="btn small" id="fullscreen" type="button">Full screen</button>
@@ -54,72 +43,57 @@
         </div>
       </div>
 
-      <div class="stage-side">
-        <section class="panel" aria-labelledby="board-title">
-          <header>
-            <h2 id="board-title">Leaderboard</h2>
-            <span class="meta" id="board-meta">No race running</span>
-          </header>
-          <div class="panel-body">
-            <table class="board" id="board" hidden>
-              <thead>
-                <tr><th>Pos</th><th>Driver</th><th class="r">Laps</th><th class="r hide-sm">Best</th><th class="r">Gap</th></tr>
-              </thead>
-              <tbody id="board-rows"></tbody>
-            </table>
-            <p class="board-empty" id="board-empty">Positions and lap times appear here when a race starts.</p>
-          </div>
+      <div class="side">
+        <section class="panel" aria-labelledby="spot-title">
+          <header><h2 id="spot-title">On camera now</h2></header>
+          <div class="spot" id="spot" hidden></div>
+          <p class="spot-empty" id="spot-empty">When the host puts a bird in front of the camera, you'll see who it is here.</p>
         </section>
 
         <section class="panel chat" aria-labelledby="chat-title">
           <header>
-            <h2 id="chat-title">Pit wall chat</h2>
+            <h2 id="chat-title">Yard chat</h2>
             <span class="meta" id="chat-count"></span>
           </header>
           <ul class="chat-log" id="chat-log" aria-live="polite"></ul>
-          <p class="chat-empty" id="chat-empty">Chat opens when race control is online.</p>
+          <p class="chat-empty" id="chat-empty">Chat opens when the host is online.</p>
           <form id="chat-form" autocomplete="off">
             <div class="name-field">
               <label class="visually-hidden" for="chat-name">Your name</label>
               <input type="text" id="chat-name" placeholder="Your name" maxlength="24" required>
             </div>
             <label class="visually-hidden" for="chat-text">Message</label>
-            <input type="text" id="chat-text" placeholder="Write a message" maxlength="280" required disabled>
+            <input type="text" id="chat-text" placeholder="Ask about a bird" maxlength="280" required disabled>
             <button class="btn primary" type="submit" id="chat-send" disabled>Send</button>
           </form>
         </section>
       </div>
     </div>
 
-    <section class="section" aria-labelledby="schedule-title">
+    <section class="section" aria-labelledby="flock-title">
       <div class="wrap">
-        <h2 id="schedule-title">Race schedule</h2>
-        <p class="lede">Times are shown in track time.</p>
-        <div class="next-race" id="next-race" hidden>
-          <span>Next race, <strong id="next-name"></strong>, starts in</span>
-          <span class="countdown" id="next-countdown">--:--:--</span>
-        </div>
-        <ol class="schedule" id="schedule"></ol>
+        <h2 id="flock-title">Meet the flock</h2>
+        <p class="lede">Every bird you'll see on camera, with breed, bloodline and whether they're available for breeding.</p>
+        <ul class="flock" id="flock"></ul>
       </div>
     </section>
 
-    <section class="section" aria-labelledby="racers-title">
+    <section class="section" aria-labelledby="day-title">
       <div class="wrap">
-        <h2 id="racers-title">Drivers and cars</h2>
-        <p class="lede">Who's on track and what they're driving.</p>
-        <ul class="racers" id="racers"></ul>
+        <h2 id="day-title">Best times to watch</h2>
+        <p class="lede">The yard is live through the day. These are the moments viewers like most.</p>
+        <ol class="day" id="day"></ol>
       </div>
     </section>
   </main>
 
   <footer class="foot">
-    <div class="wrap">Streamed live from <span data-track-name>the track</span>.</div>
+    <div class="wrap">Streamed live from <span data-farm-name>the farm</span>.</div>
   </footer>
 
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/chat-ui.js"></script>
-  <script src="js/race.js"></script>
   <script src="js/content.js"></script>
   <script src="js/viewer.js"></script>
 </body>

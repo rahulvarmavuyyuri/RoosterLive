@@ -1,19 +1,18 @@
-// Raceway Live settings — edit these to match your track.
-window.RACE_CONFIG = {
-  siteName: "Raceway Live",
-  trackName: "the farm track",
-  timeZone: "Asia/Kolkata",
+// RoosterLive settings — edit these to match your farm.
+window.SITE_CONFIG = {
+  siteName: "RoosterLive",
+  farmName: "the farm",
 
-  // Every page (viewer, cameras, race control) must use the same streamId.
+  // Every page (viewer, cameras, host) must use the same streamId.
   // Make it long and private: anyone who knows it could broadcast under it.
-  streamId: "raceway-rv-4c81d7e2a9",
+  streamId: "roosterlive-rv-4c81d7e2a9",
 
-  // One entry per camera position. Open camera.html on a phone and pick a slot.
+  // One entry per camera spot. Open camera.html on a phone and pick a spot.
   // ids: letters, numbers and dashes only.
   cameras: [
-    { id: "start", label: "Start line" },
-    { id: "hairpin", label: "Hairpin" },
-    { id: "pits", label: "Pit lane" },
+    { id: "yard", label: "Main yard" },
+    { id: "coop", label: "Coop door" },
+    { id: "feed", label: "Feeding area" },
   ],
 
   // STUN servers help browsers find a route to each other. If some viewers
@@ -27,7 +26,7 @@ window.RACE_CONFIG = {
 };
 
 // Peer IDs derived from streamId — don't edit.
-window.RACE_IDS = {
-  hub: () => `${window.RACE_CONFIG.streamId}-control`,
-  camera: (id) => `${window.RACE_CONFIG.streamId}-cam-${id}`,
+window.SITE_IDS = {
+  hub: () => `${window.SITE_CONFIG.streamId}-host`,
+  camera: (id) => `${window.SITE_CONFIG.streamId}-cam-${id}`,
 };

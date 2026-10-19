@@ -1,10 +1,9 @@
-// Viewer: watches any online track camera, follows race control for the
-// leaderboard and chat. Everything goes peer-to-peer through PeerJS.
+// Viewer: watches any online farm camera, follows the host for chat and the
+// spotlight bird. Everything goes peer-to-peer through PeerJS.
 (function () {
-  const cfg = window.RACE_CONFIG;
-  const ids = window.RACE_IDS;
-  const { createChat, clean, store } = window.RaceChat;
-  const { standings, fmtLap, fmtClock } = window.Race;
+  const cfg = window.SITE_CONFIG;
+  const ids = window.SITE_IDS;
+  const { createChat, clean, store } = window.SiteChat;
   const $ = (id) => document.getElementById(id);
 
   const video = $("video");
@@ -17,14 +16,12 @@
   let mediaCall = null;
   let hubConn = null;
   let hubRetry = null;
-  let race = null;
-  let results = {};
-  let clockOffset = 0;     // race control clock minus ours
+  let spotlight = { bird: null, camera: null };
 
   const cams = new Map(cfg.cameras.map((c) => [c.id, { ...c, conn: null, online: false, retry: null, tab: null }]));
   const peerToCam = new Map(cfg.cameras.map((c) => [ids.camera(c.id), c.id]));
 
-  $("chat-name").value = store.get("race-name") || "";
+  $("chat-name").value = store.get("viewer-name") || "";
 
   // ---------- Overlay & badges ----------
   function showOverlay(title, text) {
@@ -42,7 +39,7 @@
     const anyOnline = [...cams.values()].some((c) => c.online);
     if (!anyOnline) {
       setLiveBadge(false);
-      showOverlay("No cameras are live", "The track cameras aren't streaming right now. This page connects by itself when one starts.");
+      showOverlay("No cameras are live", "The farm cameras aren't streaming right now. This page connects by itself when one starts.");
     } else if (selected && !cams.get(selected).online) {
       setLiveBadge(false);
       showOverlay(`${cams.get(selected).label} is offline`, "Pick another camera above.");
@@ -109,6 +106,7 @@
       renderTabs();
       if (selected === cam.id && !mediaCall) select(cam.id);
       else autoSelect();
+      if (spotlight.camera === cam.id) renderSpotlight();
     });
     const lost = () => {
       if (cam.conn !== c) return;
@@ -133,7 +131,7 @@
     cam.retry = setTimeout(() => probe(cam), 8000);
   }
 
-  // ---------- Race control ----------
+  // ---------- Host (chat + spotlight) ----------
   function connectHub() {
     clearTimeout(hubRetry);
     if (!peer || peer.destroyed) return;
@@ -155,11 +153,9 @@
         case "chat":
         case "system": chat.add(msg); break;
         case "count": setCount(Number(msg.n) || 0); break;
-        case "race":
-          race = msg.race || null;
-          results = msg.results || {};
-          if (msg.now) clockOffset = msg.now - Date.now();
-          renderRace();
+        case "spotlight":
+          spotlight = { bird: msg.bird || null, camera: msg.camera || null };
+          renderSpotlight();
           break;
       }
     });
@@ -172,7 +168,7 @@
     hubConn = null;
     $("chat-text").disabled = true;
     $("chat-send").disabled = true;
-    $("chat-empty").textContent = "Chat opens when race control is online.";
+    $("chat-empty").textContent = "Chat opens when the host is online.";
     $("viewer-badge").hidden = true;
     $("chat-count").textContent = "";
     clearTimeout(hubRetry);
@@ -186,75 +182,13 @@
     $("chat-count").textContent = label;
   }
 
-  // ---------- Leaderboard & HUD ----------
-  function cell(text, cls) {
-    const td = document.createElement("td");
-    if (cls) td.className = cls;
-    if (text && typeof text === "object") td.append(text); else td.textContent = text;
-    return td;
+  // ---------- Spotlight ----------
+  function renderSpotlight() {
+    const cam = spotlight.camera && cams.get(spotlight.camera);
+    window.FarmData.setSpotlight(spotlight.bird, cam ? cam.label : null);
+    // Follow the host to the spotlight camera unless the viewer picked one themselves.
+    if (cam && cam.online && !userPicked && selected !== cam.id) select(cam.id);
   }
-
-  function renderRace() {
-    const data = window.RaceData.get();
-    window.RaceData.update(race, results);
-
-    const rows = standings(race, data.racersById);
-    const board = $("board");
-    if (!race || !rows.length) {
-      board.hidden = true;
-      $("board-empty").hidden = false;
-      $("board-meta").textContent = "No race running";
-      $("hud").hidden = true;
-      return;
-    }
-
-    $("board-meta").textContent =
-      race.status === "running" ? `${race.name}, live` :
-      race.status === "finished" ? `${race.name}, final` : `${race.name}, on the grid`;
-    board.hidden = false;
-    $("board-empty").hidden = true;
-
-    $("board-rows").replaceChildren(...rows.map((r) => {
-      const tr = document.createElement("tr");
-      if (r.finished) tr.className = "done";
-      const who = document.createElement("div");
-      who.className = "who";
-      const pl = document.createElement("span");
-      pl.className = "plate";
-      pl.textContent = r.racer.number;
-      const nm = document.createElement("span");
-      nm.textContent = r.racer.name;
-      who.append(pl, nm);
-      tr.append(
-        cell(String(r.position), "pos"),
-        cell(who),
-        cell(String(r.laps), "r"),
-        cell(fmtLap(r.bestLap), "r hide-sm" + (r.fastest ? " fast" : "")),
-        cell(r.gap, "r"),
-      );
-      return tr;
-    }));
-
-    const leaderLaps = rows[0] ? rows[0].laps : 0;
-    $("hud").hidden = false;
-    $("hud-race").textContent = race.name;
-    const flag = $("hud-flag");
-    flag.className = "hud-flag " + (race.status === "running" ? "" : race.status);
-    flag.textContent = race.status === "running" ? "Racing" : race.status === "finished" ? "Finished" : "Grid";
-    $("hud-laps").textContent = race.status === "finished"
-      ? `${leaderLaps} lap${leaderLaps === 1 ? "" : "s"}`
-      : `Lap ${Math.min(leaderLaps + 1, race.laps)} of ${race.laps}`;
-    tickClock();
-  }
-
-  function tickClock() {
-    if (!race) return;
-    let ms = 0;
-    if (race.status === "running" && race.startedAt) ms = Date.now() + clockOffset - race.startedAt;
-    else if (race.status === "finished" && race.startedAt) ms = (race.finishedAt || race.startedAt) - race.startedAt;
-    $("hud-clock").textContent = fmtClock(ms);
-  }
-  setInterval(tickClock, 100);
 
   // ---------- Peer ----------
   function startPeer() {
@@ -326,7 +260,7 @@
     const name = clean($("chat-name").value, 24);
     const text = clean($("chat-text").value, cfg.chat.maxLength);
     if (!name || !text || !hubConn || !hubConn.open) return;
-    store.set("race-name", name);
+    store.set("viewer-name", name);
     hubConn.send({ type: "chat", name, text });
     $("chat-text").value = "";
     $("chat-text").focus();
@@ -334,7 +268,7 @@
 
   renderTabs();
   setLiveBadge(false);
-  window.RaceData.ready.then(renderRace);
+  window.FarmData.ready.then(renderSpotlight);
   if (typeof Peer === "undefined") {
     showOverlay("Video player didn't load", "A script was blocked. Turn off content blockers for this page and reload.");
   } else {

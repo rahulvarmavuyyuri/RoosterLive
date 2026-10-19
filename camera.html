@@ -3,21 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Track camera — Raceway Live</title>
+  <title>Farm camera — RoosterLive</title>
   <meta name="robots" content="noindex">
   <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&family=Big+Shoulders+Display:wght@800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;700&family=Rye&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header class="masthead">
+  <header class="sign">
     <div class="wrap">
-      <h1>Track camera</h1>
-      <p><a href="./">Viewer page</a> or <a href="control.html">race control</a></p>
+      <h1>Farm camera</h1>
+      <p><a href="./">Viewer page</a> or <a href="host.html">host page</a></p>
     </div>
-    <div class="kerb" aria-hidden="true"></div>
   </header>
 
   <main class="wrap ops">
@@ -31,7 +30,7 @@
         <div class="screen-overlay" id="overlay">
           <div>
             <h2>Camera is off</h2>
-            <p>Mount this phone at its spot on the track, choose the position, then go live.</p>
+            <p>Point this phone at its spot on the farm, choose the spot, then go live.</p>
           </div>
         </div>
       </div>
@@ -41,9 +40,8 @@
       <header><h2 id="cam-title">This camera</h2></header>
       <div class="panel-body">
         <p class="status-line" id="status-line">Ready when you are.</p>
-
         <div class="field">
-          <label for="slot">Position on track</label>
+          <label for="slot">Spot on the farm</label>
           <select id="slot"></select>
         </div>
         <div class="field">
@@ -59,13 +57,12 @@
           </select>
           <p class="hint">Each viewer watching this camera gets their own copy of the video from this phone.</p>
         </div>
-
         <div class="row">
           <button class="btn primary" id="start" type="button">Go live</button>
           <button class="btn" id="stop" type="button" disabled>Stop</button>
-          <button class="btn" id="mic" type="button" disabled>Mute engine sound</button>
+          <button class="btn" id="mic" type="button" disabled>Mute sound</button>
         </div>
-        <p class="hint">Keep this page open with the screen on. Plug the phone into power.</p>
+        <p class="hint">Keep this page open with the screen on, and plug the phone into power.</p>
       </div>
     </section>
   </main>

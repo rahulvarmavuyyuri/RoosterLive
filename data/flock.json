@@ -1,0 +1,62 @@
+[
+  {
+    "id": "sultan",
+    "name": "Sultan",
+    "breed": "Aseel",
+    "age": "3 years",
+    "weight": "4.2 kg",
+    "comb": "Pea comb",
+    "bloodline": "Sire: Raja II, Dam: Meena",
+    "about": "Copper hackles and a deep green tail. Upright, broad-chested and calm with handlers.",
+    "available": true,
+    "photo": "images/flock/sultan.svg"
+  },
+  {
+    "id": "chintu",
+    "name": "Chintu",
+    "breed": "White Leghorn",
+    "age": "2 years",
+    "weight": "2.6 kg",
+    "comb": "Single comb",
+    "bloodline": "Hatchery line",
+    "about": "Pure white with a big floppy comb. The loudest morning crow on the farm.",
+    "available": false,
+    "photo": "images/flock/chintu.svg"
+  },
+  {
+    "id": "kalu",
+    "name": "Kalu",
+    "breed": "Kadaknath",
+    "age": "2 years",
+    "weight": "2.1 kg",
+    "comb": "Single comb",
+    "bloodline": "Sire: Shyam, Dam: Rani",
+    "about": "Black from beak to toes, with a purple-green sheen in the sun.",
+    "available": true,
+    "photo": "images/flock/kalu.svg"
+  },
+  {
+    "id": "bhola",
+    "name": "Bhola",
+    "breed": "Brahma",
+    "age": "1 year",
+    "weight": "4.8 kg",
+    "comb": "Pea comb",
+    "bloodline": "Sire: Gajraj, Dam: Lakshmi",
+    "about": "Gentle giant with feathered feet and silver-laced hackles.",
+    "available": true,
+    "photo": "images/flock/bhola.svg"
+  },
+  {
+    "id": "raja",
+    "name": "Raja",
+    "breed": "Rhode Island Red",
+    "age": "4 years",
+    "weight": "3.6 kg",
+    "comb": "Rose comb",
+    "bloodline": "Sire: Tipu, Dam: Gauri",
+    "about": "Deep mahogany red. The senior bird who keeps the young ones in line.",
+    "available": false,
+    "photo": "images/flock/raja.svg"
+  }
+]

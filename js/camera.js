@@ -1,7 +1,7 @@
-// Track camera: streams this device's camera to viewers who choose this position.
+// Farm camera: streams this device's camera to viewers who choose this spot.
 (function () {
-  const cfg = window.RACE_CONFIG;
-  const ids = window.RACE_IDS;
+  const cfg = window.SITE_CONFIG;
+  const ids = window.SITE_IDS;
   const $ = (id) => document.getElementById(id);
 
   const preview = $("preview");
@@ -20,7 +20,7 @@
 
   const params = new URLSearchParams(location.search);
   let savedSlot = params.get("cam");
-  try { savedSlot = savedSlot || localStorage.getItem("race-cam-slot"); } catch { /* ignore */ }
+  try { savedSlot = savedSlot || localStorage.getItem("farm-cam-slot"); } catch { /* ignore */ }
   slotSel.replaceChildren(...cfg.cameras.map((c) => {
     const o = new Option(c.label, c.id);
     o.selected = c.id === savedSlot;
@@ -79,7 +79,7 @@
     if (!stream) return;
     stream.getAudioTracks().forEach((t) => (t.enabled = micOn));
     micBtn.disabled = stream.getAudioTracks().length === 0;
-    micBtn.textContent = micOn ? "Mute engine sound" : "Turn sound on";
+    micBtn.textContent = micOn ? "Mute sound" : "Turn sound on";
   }
 
   async function swapStream(next) {
@@ -163,7 +163,7 @@
     }
     const slot = slotSel.value;
     const label = cfg.cameras.find((c) => c.id === slot)?.label || slot;
-    try { localStorage.setItem("race-cam-slot", slot); } catch { /* ignore */ }
+    try { localStorage.setItem("farm-cam-slot", slot); } catch { /* ignore */ }
 
     startBtn.disabled = true;
     status("Opening the camera…");
@@ -197,7 +197,7 @@
     });
     peer.on("error", (err) => {
       if (err.type === "unavailable-id") {
-        status(`Another phone is already live as ${label}. Pick a different position.`, "err");
+        status(`Another phone is already live as ${label}. Pick a different spot.`, "err");
         stop(true);
       } else if (err.type !== "peer-unavailable") {
         status("Stream error: " + (err.message || err.type), "err");

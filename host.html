@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Host — RoosterLive</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;700&family=Rye&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="sign">
+    <div class="wrap">
+      <h1>Host</h1>
+      <p><a href="./">Viewer page</a> or <a href="camera.html">farm camera</a></p>
+    </div>
+  </header>
+
+  <main class="wrap ops">
+    <section class="panel" aria-labelledby="spot-title">
+      <header>
+        <h2 id="spot-title">Who's on camera?</h2>
+        <span class="meta" id="spot-meta">Nobody in the spotlight</span>
+      </header>
+      <div class="panel-body">
+        <div class="field">
+          <label for="spot-cam">Camera they're on</label>
+          <select id="spot-cam"></select>
+          <p class="hint">Viewers who haven't picked a camera themselves switch to this one.</p>
+        </div>
+        <div class="pick-grid" id="picks"></div>
+        <div class="row" style="margin-top:14px">
+          <button class="btn" id="clear" type="button">Clear spotlight</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="side">
+      <section class="panel" aria-labelledby="link-title">
+        <header>
+          <h2 id="link-title">Broadcast</h2>
+          <span class="meta" id="viewer-count"></span>
+        </header>
+        <div class="panel-body">
+          <p class="status-line" id="status-line">Connecting…</p>
+          <p class="hint">Keep this page open while you're live. It runs the chat and tells viewers which bird they're watching.</p>
+        </div>
+      </section>
+
+      <section class="panel chat" aria-labelledby="chat-title">
+        <header><h2 id="chat-title">Yard chat</h2></header>
+        <ul class="chat-log" id="chat-log" aria-live="polite"></ul>
+        <p class="chat-empty" id="chat-empty">Viewer messages show up here.</p>
+        <form id="chat-form" autocomplete="off">
+          <div class="name-field">
+            <label class="visually-hidden" for="chat-name">Host name</label>
+            <input type="text" id="chat-name" placeholder="Host name" maxlength="24" value="Farm" required>
+          </div>
+          <label class="visually-hidden" for="chat-text">Message</label>
+          <input type="text" id="chat-text" placeholder="Write to viewers" maxlength="280" required disabled>
+          <button class="btn primary" type="submit" id="chat-send" disabled>Send</button>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/chat-ui.js"></script>
+  <script src="js/host.js"></script>
+</body>
+</html>

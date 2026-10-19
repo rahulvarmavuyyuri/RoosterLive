@@ -47,5 +47,5 @@
     return { add, reset };
   }
 
-  window.RaceChat = { createChat, clean, store };
+  window.SiteChat = { createChat, clean, store };
 })();
