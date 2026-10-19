@@ -29,6 +29,9 @@ window.SITE_CONFIG = {
 
   chat: { maxLength: 280, historySize: 50 },
 
+  // Where the host page saves new birds (Meet the flock).
+  github: { owner: "rahulvarmavuyyuri", repo: "RoosterLive", branch: "main" },
+
   // Selling: shown on the "Compare birds" panel.
   currency: "₹",
   // WhatsApp number with country code, digits only, e.g. "919876543210".

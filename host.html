@@ -73,11 +73,83 @@
         </form>
       </section>
     </div>
+    <section class="panel manage" aria-labelledby="manage-title">
+      <header><h2 id="manage-title">Manage the flock</h2><span class="meta" id="m-count"></span></header>
+      <div class="panel-body manage-body">
+        <div class="manage-key">
+          <h3>GitHub key</h3>
+          <p class="hint">The host page needs a key to save birds to your site. It stays only on this device.</p>
+          <div class="row">
+            <label class="visually-hidden" for="m-token">GitHub key</label>
+            <input type="password" id="m-token" autocomplete="off" placeholder="Paste your key (github_pat_…)" style="flex:1 1 220px">
+            <button class="btn" id="m-token-save" type="button">Save key</button>
+            <button class="btn small" id="m-token-forget" type="button">Forget key</button>
+          </div>
+          <details class="hint">
+            <summary>How to get a key (one time)</summary>
+            <ol>
+              <li>Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a> and sign in.</li>
+              <li>Name it "RoosterLive host" and pick an expiry date.</li>
+              <li>Under <b>Repository access</b>, choose <b>Only select repositories</b> and pick <b>RoosterLive</b>.</li>
+              <li>Under <b>Permissions → Repository permissions</b>, set <b>Contents</b> to <b>Read and write</b>.</li>
+              <li>Tap <b>Generate token</b>, copy it, paste it above and tap <b>Save key</b>.</li>
+            </ol>
+          </details>
+          <p class="status-line" id="m-key-status" hidden></p>
+        </div>
+
+        <form class="manage-form" id="m-form" autocomplete="off">
+          <h3 id="m-form-title">Add a bird</h3>
+          <input type="hidden" id="m-id">
+          <div class="field">
+            <label for="m-photo">Photo</label>
+            <input type="file" id="m-photo" accept="image/*">
+            <img id="m-photo-preview" alt="" hidden>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="m-name">Name</label><input type="text" id="m-name" maxlength="40" required placeholder="e.g. Pingala"></div>
+            <div class="field"><label for="m-te">Telugu name</label><input type="text" id="m-te" maxlength="40" lang="te" placeholder="e.g. పింగళ"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="m-breed">Plumage / breed</label><input type="text" id="m-breed" maxlength="60" placeholder="e.g. Red-brown plumage"></div>
+            <div class="field"><label for="m-price">Price (₹)</label><input type="number" id="m-price" min="0" step="100" inputmode="numeric" placeholder="Leave empty for 'on request'"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="m-age">Age</label><input type="text" id="m-age" maxlength="30" placeholder="e.g. 2 years"></div>
+            <div class="field"><label for="m-weight">Weight</label><input type="text" id="m-weight" maxlength="30" placeholder="e.g. 3.5 kg"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="m-comb">Comb</label><input type="text" id="m-comb" maxlength="30" placeholder="e.g. Pea comb"></div>
+            <div class="field"><label for="m-line">Bloodline</label><input type="text" id="m-line" maxlength="80" placeholder="e.g. Sire: Raja, Dam: Meena"></div>
+          </div>
+          <div class="field"><label for="m-about">About</label><input type="text" id="m-about" maxlength="200" placeholder="One or two lines about this bird"></div>
+          <div class="field">
+            <label for="m-status">Sale status</label>
+            <select id="m-status">
+              <option value="sale">For sale</option>
+              <option value="keep">Not for sale</option>
+              <option value="none">Don't show a status</option>
+            </select>
+          </div>
+          <div class="row">
+            <button class="btn primary" type="submit" id="m-save">Save bird</button>
+            <button class="btn" type="button" id="m-cancel" hidden>Cancel edit</button>
+          </div>
+          <p class="status-line" id="m-status-line" hidden></p>
+        </form>
+
+        <div class="manage-list">
+          <h3>Birds on the site</h3>
+          <ul class="shared-list" id="m-list"></ul>
+        </div>
+      </div>
+    </section>
   </main>
 
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/chat-ui.js"></script>
   <script src="js/host.js"></script>
+  <script src="js/manage.js"></script>
 </body>
 </html>

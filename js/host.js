@@ -159,15 +159,19 @@
     $("chat-text").focus();
   });
 
+  function setBirds(flock) {
+    birds = flock;
+    byId = Object.fromEntries(flock.map((b) => [b.id, b]));
+    if (state.spotlight.bird && !byId[state.spotlight.bird]) state.spotlight = { bird: null, camera: null };
+    $("picks").replaceChildren();
+    renderPicks();
+  }
+  window.HostFlock = { setBirds };
+
   // ---------- Boot ----------
   fetch("data/flock.json", { cache: "no-cache" })
     .then((r) => r.json())
-    .then((flock) => {
-      birds = flock;
-      byId = Object.fromEntries(flock.map((b) => [b.id, b]));
-      if (state.spotlight.bird && !byId[state.spotlight.bird]) state.spotlight = { bird: null, camera: null };
-      renderPicks();
-    })
+    .then(setBirds)
     .catch((err) => status("Couldn't load data/flock.json: " + err.message, "err"));
   chat.reset(state.history);
 
