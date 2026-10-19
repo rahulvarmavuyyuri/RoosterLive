@@ -10,8 +10,8 @@
   --sign-shadow: #2b1b10;
   --on-comb: #ffffff;
 
-  --display: "Rye", Georgia, serif;
-  --body: "Bitter", Georgia, serif;
+  --display: "Fredoka", "Trebuchet MS", sans-serif;
+  --body: "Nunito", system-ui, sans-serif;
 
   --gutter: clamp(16px, 4vw, 40px);
 }
@@ -37,7 +37,7 @@ a { color: var(--comb); text-underline-offset: 3px; }
 /* ---------- Painted sign header ---------- */
 .sign .wrap { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px 24px; padding-top: 26px; padding-bottom: 18px; }
 .sign h1 {
-  margin: 0; font-family: var(--display); font-weight: 400;
+  margin: 0; font-family: var(--display); font-weight: 700;
   font-size: clamp(2.6rem, 8vw, 5rem); line-height: 1;
   color: var(--comb); text-shadow: 3px 3px 0 var(--sign-shadow);
 }
@@ -62,7 +62,7 @@ a { color: var(--comb); text-underline-offset: 3px; }
 .screen { position: relative; background: #1f2a1a; border: 10px solid var(--frame); border-radius: 6px; aspect-ratio: 16 / 9; overflow: hidden; }
 .screen video { width: 100%; height: 100%; object-fit: contain; }
 .screen-overlay { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: #faf0cc; }
-.screen-overlay h2 { margin: 0 0 6px; font-family: var(--display); font-weight: 400; font-size: clamp(1.6rem, 4vw, 2.4rem); line-height: 1.1; }
+.screen-overlay h2 { margin: 0 0 6px; font-family: var(--display); font-weight: 700; font-size: clamp(1.6rem, 4vw, 2.4rem); line-height: 1.1; }
 .screen-overlay p { margin: 0 auto; max-width: 40ch; opacity: 0.85; }
 
 .badge-row { position: absolute; top: 10px; left: 10px; display: flex; gap: 8px; }
@@ -110,7 +110,7 @@ input[type="text"], select { width: 100%; min-width: 0; font: inherit; color: va
 
 /* ---------- Sections ---------- */
 .section { padding: 44px 0; border-top: 3px solid var(--ink); }
-.section h2 { margin: 0 0 6px; font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 5vw, 2.6rem); line-height: 1.1; }
+.section h2 { margin: 0 0 6px; font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 5vw, 2.6rem); line-height: 1.1; }
 .section .lede { margin: 0 0 26px; max-width: 62ch; color: var(--muted); }
 
 .flock { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 26px; list-style: none; margin: 0; padding: 0; }
