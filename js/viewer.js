@@ -1,155 +1,342 @@
-// Viewer: connects to the broadcaster over PeerJS, plays the stream, runs chat.
+// Viewer: watches any online track camera, follows race control for the
+// leaderboard and chat. Everything goes peer-to-peer through PeerJS.
 (function () {
-  const cfg = window.ROOSTER_CONFIG;
-  const { createChat, clean, store } = window.RoosterChat;
+  const cfg = window.RACE_CONFIG;
+  const ids = window.RACE_IDS;
+  const { createChat, clean, store } = window.RaceChat;
+  const { standings, fmtLap, fmtClock } = window.Race;
   const $ = (id) => document.getElementById(id);
 
   const video = $("video");
   const overlay = $("overlay");
-  const statusBadge = $("status-badge");
-  const viewerBadge = $("viewer-badge");
-  const unmuteBtn = $("unmute");
-  const chatText = $("chat-text");
-  const chatSend = $("chat-send");
-  const chatName = $("chat-name");
-
   const chat = createChat({ log: $("chat-log"), empty: $("chat-empty") });
 
   let peer = null;
-  let conn = null;
-  let retryTimer = null;
-  let lastMediaCall = null;
+  let selected = null;     // camera id being watched
+  let userPicked = false;  // user chose a camera themselves
+  let mediaCall = null;
+  let hubConn = null;
+  let hubRetry = null;
+  let race = null;
+  let results = {};
+  let clockOffset = 0;     // race control clock minus ours
 
-  chatName.value = store.get("rooster-name") || "";
+  const cams = new Map(cfg.cameras.map((c) => [c.id, { ...c, conn: null, online: false, retry: null, tab: null }]));
+  const peerToCam = new Map(cfg.cameras.map((c) => [ids.camera(c.id), c.id]));
 
+  $("chat-name").value = store.get("race-name") || "";
+
+  // ---------- Overlay & badges ----------
   function showOverlay(title, text) {
     $("overlay-title").textContent = title;
     $("overlay-text").textContent = text;
     overlay.hidden = false;
   }
 
-  function setLive(live) {
-    statusBadge.textContent = live ? "Live" : "Offline";
-    statusBadge.classList.toggle("live", live);
-    chatText.disabled = !live;
-    chatSend.disabled = !live;
-    if (!live) {
-      viewerBadge.hidden = true;
-      $("chat-count").textContent = "";
+  function setLiveBadge(live) {
+    $("status-badge").textContent = live ? "Live" : "Offline";
+    $("status-badge").classList.toggle("live", live);
+  }
+
+  function refreshOverlay() {
+    const anyOnline = [...cams.values()].some((c) => c.online);
+    if (!anyOnline) {
+      setLiveBadge(false);
+      showOverlay("No cameras are live", "The track cameras aren't streaming right now. This page connects by itself when one starts.");
+    } else if (selected && !cams.get(selected).online) {
+      setLiveBadge(false);
+      showOverlay(`${cams.get(selected).label} is offline`, "Pick another camera above.");
     }
   }
 
-  function setViewers(n) {
-    const label = n === 1 ? "1 watching" : `${n} watching`;
-    viewerBadge.textContent = label;
-    viewerBadge.hidden = false;
-    $("chat-count").textContent = label;
+  // ---------- Camera tabs ----------
+  function renderTabs() {
+    const wrap = $("cam-tabs");
+    if (!wrap.children.length) {
+      for (const cam of cams.values()) {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "cam-tab";
+        b.textContent = cam.label;
+        b.addEventListener("click", () => { userPicked = true; select(cam.id); });
+        cam.tab = b;
+        wrap.append(b);
+      }
+    }
+    for (const cam of cams.values()) {
+      cam.tab.classList.toggle("online", cam.online);
+      cam.tab.disabled = !cam.online;
+      cam.tab.setAttribute("aria-pressed", String(cam.id === selected));
+      cam.tab.title = cam.online ? `Watch ${cam.label}` : `${cam.label} is offline`;
+    }
   }
 
-  function scheduleRetry(delay = 6000) {
-    clearTimeout(retryTimer);
-    retryTimer = setTimeout(connect, delay);
-  }
-
-  function goOffline() {
-    setLive(false);
+  function select(id) {
+    if (id === selected && mediaCall) return;
+    const prev = selected && cams.get(selected);
+    if (prev && prev.conn && prev.conn.open) prev.conn.send({ type: "unwatch" });
+    if (mediaCall) { mediaCall.close(); mediaCall = null; }
     video.srcObject = null;
-    unmuteBtn.hidden = true;
-    showOverlay("The coop is off air", "The camera isn't streaming right now. This page reconnects by itself when it's back.");
-    scheduleRetry();
+    selected = id;
+    const cam = cams.get(id);
+    renderTabs();
+    if (cam && cam.online && cam.conn.open) {
+      showOverlay(cam.label, "Starting the video…");
+      cam.conn.send({ type: "watch" });
+    } else {
+      refreshOverlay();
+    }
   }
 
-  function connect() {
-    clearTimeout(retryTimer);
-    if (!peer || peer.destroyed) return startPeer();
-    if (peer.disconnected) { peer.reconnect(); return; }
+  // Only switch automatically when nothing (or an offline camera) is selected.
+  function autoSelect() {
+    const current = selected && cams.get(selected);
+    if (current && current.online) return;
+    const first = [...cams.values()].find((c) => c.online);
+    if (first) select(first.id);
+  }
 
-    const old = conn;
-    const c = peer.connect(cfg.streamId, { reliable: true });
-    conn = c;
-    if (old) old.close(); // its handlers ignore events once it's no longer current
+  // ---------- Camera connections ----------
+  function probe(cam) {
+    clearTimeout(cam.retry);
+    if (!peer || peer.destroyed) return;
+    if (peer.disconnected) { cam.retry = setTimeout(() => probe(cam), 8000); return; }
+    const c = peer.connect(ids.camera(cam.id), { reliable: true });
+    cam.conn = c;
+    c.on("open", () => {
+      if (cam.conn !== c) return;
+      cam.online = true;
+      renderTabs();
+      if (selected === cam.id && !mediaCall) select(cam.id);
+      else autoSelect();
+    });
+    const lost = () => {
+      if (cam.conn !== c) return;
+      camOffline(cam);
+    };
+    c.on("close", lost);
+    c.on("error", lost);
+  }
 
-    const current = () => c === conn;
+  function camOffline(cam) {
+    cam.online = false;
+    cam.conn = null;
+    if (selected === cam.id) {
+      if (mediaCall) { mediaCall.close(); mediaCall = null; }
+      video.srcObject = null;
+      userPicked = false;
+    }
+    renderTabs();
+    refreshOverlay();
+    autoSelect();
+    clearTimeout(cam.retry);
+    cam.retry = setTimeout(() => probe(cam), 8000);
+  }
+
+  // ---------- Race control ----------
+  function connectHub() {
+    clearTimeout(hubRetry);
+    if (!peer || peer.destroyed) return;
+    if (peer.disconnected) { hubRetry = setTimeout(connectHub, 8000); return; }
+    const c = peer.connect(ids.hub(), { reliable: true });
+    hubConn = c;
+    const current = () => hubConn === c;
 
     c.on("open", () => {
       if (!current()) return;
-      setLive(true);
-      showOverlay("Coop found", "Starting the video…");
+      $("chat-text").disabled = false;
+      $("chat-send").disabled = false;
+      $("chat-empty").textContent = "No messages yet. Say hello.";
     });
-
     c.on("data", (msg) => {
-      if (!current()) return;
-      if (!msg || typeof msg !== "object") return;
-      if (msg.type === "history") chat.reset(Array.isArray(msg.messages) ? msg.messages : []);
-      else if (msg.type === "chat" || msg.type === "system") chat.add(msg);
-      else if (msg.type === "count") setViewers(Number(msg.n) || 0);
+      if (!current() || !msg || typeof msg !== "object") return;
+      switch (msg.type) {
+        case "history": chat.reset(Array.isArray(msg.messages) ? msg.messages : []); break;
+        case "chat":
+        case "system": chat.add(msg); break;
+        case "count": setCount(Number(msg.n) || 0); break;
+        case "race":
+          race = msg.race || null;
+          results = msg.results || {};
+          if (msg.now) clockOffset = msg.now - Date.now();
+          renderRace();
+          break;
+      }
     });
-
-    c.on("close", () => { if (current()) goOffline(); });
-    c.on("error", () => { if (current()) goOffline(); });
+    const lost = () => { if (current()) hubOffline(); };
+    c.on("close", lost);
+    c.on("error", lost);
   }
 
+  function hubOffline() {
+    hubConn = null;
+    $("chat-text").disabled = true;
+    $("chat-send").disabled = true;
+    $("chat-empty").textContent = "Chat opens when race control is online.";
+    $("viewer-badge").hidden = true;
+    $("chat-count").textContent = "";
+    clearTimeout(hubRetry);
+    hubRetry = setTimeout(connectHub, 8000);
+  }
+
+  function setCount(n) {
+    const label = n === 1 ? "1 watching" : `${n} watching`;
+    $("viewer-badge").textContent = label;
+    $("viewer-badge").hidden = false;
+    $("chat-count").textContent = label;
+  }
+
+  // ---------- Leaderboard & HUD ----------
+  function cell(text, cls) {
+    const td = document.createElement("td");
+    if (cls) td.className = cls;
+    if (text && typeof text === "object") td.append(text); else td.textContent = text;
+    return td;
+  }
+
+  function renderRace() {
+    const data = window.RaceData.get();
+    window.RaceData.update(race, results);
+
+    const rows = standings(race, data.racersById);
+    const board = $("board");
+    if (!race || !rows.length) {
+      board.hidden = true;
+      $("board-empty").hidden = false;
+      $("board-meta").textContent = "No race running";
+      $("hud").hidden = true;
+      return;
+    }
+
+    $("board-meta").textContent =
+      race.status === "running" ? `${race.name}, live` :
+      race.status === "finished" ? `${race.name}, final` : `${race.name}, on the grid`;
+    board.hidden = false;
+    $("board-empty").hidden = true;
+
+    $("board-rows").replaceChildren(...rows.map((r) => {
+      const tr = document.createElement("tr");
+      if (r.finished) tr.className = "done";
+      const who = document.createElement("div");
+      who.className = "who";
+      const pl = document.createElement("span");
+      pl.className = "plate";
+      pl.textContent = r.racer.number;
+      const nm = document.createElement("span");
+      nm.textContent = r.racer.name;
+      who.append(pl, nm);
+      tr.append(
+        cell(String(r.position), "pos"),
+        cell(who),
+        cell(String(r.laps), "r"),
+        cell(fmtLap(r.bestLap), "r hide-sm" + (r.fastest ? " fast" : "")),
+        cell(r.gap, "r"),
+      );
+      return tr;
+    }));
+
+    const leaderLaps = rows[0] ? rows[0].laps : 0;
+    $("hud").hidden = false;
+    $("hud-race").textContent = race.name;
+    const flag = $("hud-flag");
+    flag.className = "hud-flag " + (race.status === "running" ? "" : race.status);
+    flag.textContent = race.status === "running" ? "Racing" : race.status === "finished" ? "Finished" : "Grid";
+    $("hud-laps").textContent = race.status === "finished"
+      ? `${leaderLaps} lap${leaderLaps === 1 ? "" : "s"}`
+      : `Lap ${Math.min(leaderLaps + 1, race.laps)} of ${race.laps}`;
+    tickClock();
+  }
+
+  function tickClock() {
+    if (!race) return;
+    let ms = 0;
+    if (race.status === "running" && race.startedAt) ms = Date.now() + clockOffset - race.startedAt;
+    else if (race.status === "finished" && race.startedAt) ms = (race.finishedAt || race.startedAt) - race.startedAt;
+    $("hud-clock").textContent = fmtClock(ms);
+  }
+  setInterval(tickClock, 100);
+
+  // ---------- Peer ----------
   function startPeer() {
     peer = new Peer({ config: { iceServers: cfg.iceServers } });
 
-    peer.on("open", connect);
-    peer.on("disconnected", () => scheduleRetry(3000));
+    // "open" fires on first connect and again after a reconnect.
+    peer.on("open", () => {
+      for (const cam of cams.values()) if (!cam.conn) probe(cam);
+      if (!hubConn) connectHub();
+    });
+
+    peer.on("disconnected", () => setTimeout(() => peer && !peer.destroyed && peer.reconnect(), 3000));
 
     peer.on("call", (call) => {
-      if (lastMediaCall) lastMediaCall.close();
-      lastMediaCall = call;
+      const camId = peerToCam.get(call.peer);
+      if (camId !== selected) { call.close(); return; }
+      if (mediaCall) mediaCall.close();
+      mediaCall = call;
       call.answer();
       call.on("stream", (stream) => {
+        if (mediaCall !== call) return;
         video.srcObject = stream;
         video.play().catch(() => {});
         overlay.hidden = true;
-        unmuteBtn.hidden = !video.muted || stream.getAudioTracks().length === 0;
+        setLiveBadge(true);
+        $("unmute").hidden = !video.muted || stream.getAudioTracks().length === 0;
       });
-      call.on("close", () => { if (lastMediaCall === call) video.srcObject = null; });
+      call.on("close", () => {
+        if (mediaCall !== call) return;
+        mediaCall = null;
+        video.srcObject = null;
+        refreshOverlay();
+      });
     });
 
     peer.on("error", (err) => {
       if (err.type === "peer-unavailable") {
-        goOffline();
-      } else if (["network", "server-error", "socket-error", "socket-closed"].includes(err.type)) {
-        setLive(false);
-        showOverlay("Can't reach the stream server", "Check your internet connection. Retrying…");
-        scheduleRetry(8000);
-      } else {
-        console.error("PeerJS error", err);
-        scheduleRetry(8000);
+        const target = (String(err.message).match(/peer (\S+)/) || [])[1];
+        if (target === ids.hub()) { if (hubConn) hubOffline(); return; }
+        const cam = cams.get(peerToCam.get(target));
+        if (cam) camOffline(cam);
+        return;
       }
+      if (["network", "server-error", "socket-error", "socket-closed"].includes(err.type)) {
+        setLiveBadge(false);
+        showOverlay("Can't reach the stream server", "Check your internet connection. Retrying…");
+        return;
+      }
+      console.error("PeerJS error", err);
     });
   }
 
-  // ---- Controls ----
-  unmuteBtn.addEventListener("click", () => {
+  // ---------- Controls ----------
+  $("unmute").addEventListener("click", () => {
     video.muted = false;
     video.play().catch(() => {});
-    unmuteBtn.hidden = true;
+    $("unmute").hidden = true;
   });
 
   $("fullscreen").addEventListener("click", () => {
-    const target = video.parentElement;
+    const target = $("screen");
     if (document.fullscreenElement) document.exitFullscreen();
     else if (target.requestFullscreen) target.requestFullscreen();
-    else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen(); // iOS Safari
+    else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
   });
 
   $("chat-form").addEventListener("submit", (e) => {
     e.preventDefault();
-    const name = clean(chatName.value, 24);
-    const text = clean(chatText.value, cfg.chat.maxLength);
-    if (!name || !text || !conn || !conn.open) return;
-    store.set("rooster-name", name);
-    conn.send({ type: "chat", name, text });
-    chatText.value = "";
-    chatText.focus();
+    const name = clean($("chat-name").value, 24);
+    const text = clean($("chat-text").value, cfg.chat.maxLength);
+    if (!name || !text || !hubConn || !hubConn.open) return;
+    store.set("race-name", name);
+    hubConn.send({ type: "chat", name, text });
+    $("chat-text").value = "";
+    $("chat-text").focus();
   });
 
-  setLive(false);
+  renderTabs();
+  setLiveBadge(false);
+  window.RaceData.ready.then(renderRace);
   if (typeof Peer === "undefined") {
-    showOverlay("Video player didn't load", "A script was blocked. Try disabling content blockers for this page and reload.");
+    showOverlay("Video player didn't load", "A script was blocked. Turn off content blockers for this page and reload.");
   } else {
     startPeer();
   }

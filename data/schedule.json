@@ -1,0 +1,54 @@
+[
+  {
+    "id": "h1",
+    "name": "Heat 1",
+    "class": "Short course",
+    "start": "2026-10-25T10:00:00+05:30",
+    "laps": 8,
+    "racers": [
+      "arjun",
+      "vikram",
+      "kiran"
+    ]
+  },
+  {
+    "id": "h2",
+    "name": "Heat 2",
+    "class": "Buggy",
+    "start": "2026-10-25T10:30:00+05:30",
+    "laps": 8,
+    "racers": [
+      "priya",
+      "rahul",
+      "sneha"
+    ]
+  },
+  {
+    "id": "semi",
+    "name": "Semi-final",
+    "class": "Open",
+    "start": "2026-10-25T11:30:00+05:30",
+    "laps": 10,
+    "racers": [
+      "arjun",
+      "priya",
+      "rahul",
+      "vikram"
+    ]
+  },
+  {
+    "id": "final",
+    "name": "Final",
+    "class": "Open",
+    "start": "2026-10-25T13:00:00+05:30",
+    "laps": 12,
+    "racers": [
+      "arjun",
+      "priya",
+      "kiran",
+      "sneha",
+      "vikram",
+      "rahul"
+    ]
+  }
+]

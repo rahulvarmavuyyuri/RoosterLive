@@ -1,33 +1,33 @@
-// RoosterLive settings — edit these to match your coop.
-window.ROOSTER_CONFIG = {
-  siteName: "RoosterLive",
+// Raceway Live settings — edit these to match your track.
+window.RACE_CONFIG = {
+  siteName: "Raceway Live",
+  trackName: "the farm track",
+  timeZone: "Asia/Kolkata",
 
-  // The broadcaster registers under this ID and viewers connect to it.
-  // Make it long and unique so nobody else on the PeerJS cloud uses it.
-  streamId: "roosterlive-coop-rv-7f3a9c2e",
+  // Every page (viewer, cameras, race control) must use the same streamId.
+  // Make it long and private: anyone who knows it could broadcast under it.
+  streamId: "raceway-rv-4c81d7e2a9",
 
-  coop: {
-    name: "our backyard coop",
-    // Used to work out sunrise, sunset and the next crow.
-    latitude: 17.385,
-    longitude: 78.4867,
-    timeZone: "Asia/Kolkata",
-  },
+  // One entry per camera position. Open camera.html on a phone and pick a slot.
+  // ids: letters, numbers and dashes only.
+  cameras: [
+    { id: "start", label: "Start line" },
+    { id: "hairpin", label: "Hairpin" },
+    { id: "pits", label: "Pit lane" },
+  ],
 
-  // Roosters usually start crowing a little before sunrise.
-  crowMinutesBeforeSunrise: 30,
-
-  // STUN servers help viewers find a route to the broadcaster.
-  // If some viewers never get video (strict mobile/corporate networks),
-  // add a TURN server here, e.g. from metered.ca or your own coturn.
+  // STUN servers help browsers find a route to each other. If some viewers
+  // never get video, add a TURN server here (e.g. metered.ca or coturn).
   iceServers: [
     { urls: "stun:stun.l.google.com:19302" },
     { urls: "stun:stun1.l.google.com:19302" },
   ],
 
-  // Chat limits
-  chat: {
-    maxLength: 280,
-    historySize: 50,
-  },
+  chat: { maxLength: 280, historySize: 50 },
+};
+
+// Peer IDs derived from streamId — don't edit.
+window.RACE_IDS = {
+  hub: () => `${window.RACE_CONFIG.streamId}-control`,
+  camera: (id) => `${window.RACE_CONFIG.streamId}-cam-${id}`,
 };

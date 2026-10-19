@@ -1,108 +1,107 @@
-# RoosterLive
+# Raceway Live
 
-A live rooster cam website that runs entirely on GitHub Pages. A phone or laptop at the coop broadcasts its camera straight to viewers' browsers — no streaming server, no monthly bill.
+Live RC car racing for your friends, from every corner of the track. Runs entirely on GitHub Pages: phones around the track stream straight to viewers' browsers, and a race control page sends live lap times and chat. No streaming server, no monthly bill.
 
-**What viewers get**
+**Viewers get**
 
-- The live video with sound, a viewer count and full-screen mode
-- Coop chat with everyone watching
-- A "next big crow" countdown with sunrise and sunset for the coop's location
-- Meet the flock profiles
-- A photo gallery
+- Live video with engine sound, switching between track cameras (start line, hairpin, pit lane…)
+- A live leaderboard: position, laps, best lap and gap, plus a race clock over the video
+- Pit wall chat
+- The race schedule with a countdown to the next race and winners as races finish
+- Driver and car profiles with personal bests and best lap today
 
-## How it works
+## The three pages
+
+| Page | Who opens it | What it does |
+|---|---|---|
+| `index.html` | Viewers | Watch, follow the leaderboard, chat |
+| `camera.html` | One phone per camera position | Streams that position's camera |
+| `control.html` | Race director (one device) | Loads races, records laps by tapping, runs chat |
+
+`camera.html` and `control.html` aren't linked from the viewer page and are hidden from search engines.
 
 ```
- Phone at the coop (broadcast.html)
-        │  camera + mic
-        ├────────── video ──────────▶ viewer 1 (index.html)
-        ├────────── video ──────────▶ viewer 2
-        └── chat relay ◀──────────▶  everyone
-                │
-     free PeerJS cloud server (only introduces browsers to each other)
+ camera.html (Start line) ──video──┐
+ camera.html (Hairpin)    ──video──┼──▶ viewers pick a camera
+ camera.html (Pit lane)   ──video──┘
+ control.html ── lap times + chat ───▶ all viewers
+        (free PeerJS cloud server only introduces browsers to each other)
 ```
 
-The video goes peer-to-peer over WebRTC using [PeerJS](https://peerjs.com). The broadcaster sends one copy of the video to each viewer, so the number of viewers is limited by the broadcasting device's upload speed:
+## Race day
 
-| Quality | Upload per viewer | Comfortable viewers on 10 Mbps upload |
+1. **Cameras:** on each phone, open `…/camera.html`, choose its position, tap **Go live**. Mount it, plug it into power, keep the screen on. You can preselect a position with `camera.html?cam=hairpin`.
+2. **Race control:** on a tablet or laptop at the finish line, open `…/control.html`. It goes online by itself.
+3. **Share** `https://<your-username>.github.io/<repo>/` with friends.
+4. For each race: choose it, tap **Load race**, then **Start race** when the flag drops.
+5. **Tap a driver's card each time their car crosses the line.** The leaderboard updates for everyone instantly. A second tap on the same car within 2 seconds is ignored, and **Undo last lap** removes the most recent tap.
+6. A race finishes by itself when every car completes its laps, or tap **End race**. The winner is announced in chat and shown on the schedule.
+
+Race control saves its state in the browser, so refreshing the page mid-race loses nothing.
+
+## How many viewers?
+
+Each camera phone sends a separate copy of its video to every viewer watching that camera, so upload speed sets the limit. Spreading viewers across cameras helps.
+
+| Quality | Upload per viewer | Viewers per camera on 10 Mbps upload |
 |---|---|---|
 | Standard (480p) | ~0.8 Mbps | ~10 |
 | HD (720p) | ~1.5 Mbps | ~5 |
 | Full HD (1080p) | ~3 Mbps | ~2–3 |
 
-If you outgrow this, switch to YouTube Live and embed the stream instead.
-
-## Go live
-
-1. Put the site on GitHub Pages (below).
-2. On the phone at the coop, open `https://<your-username>.github.io/RoosterLive/broadcast.html`.
-3. Tap **Start broadcast** and allow camera and microphone.
-4. Share `https://<your-username>.github.io/RoosterLive/` with viewers.
-
-Tips for the coop phone: keep it on a charger, turn off battery saver, keep the browser tab in the foreground, and use Wi‑Fi rather than mobile data.
+For bigger audiences, stream one camera to YouTube Live and embed it instead.
 
 ## Put it on GitHub Pages
 
-1. Push this repository to GitHub.
-2. In the repo, go to **Settings → Pages**.
-3. Under **Build and deployment**, choose **Deploy from a branch**, branch `main`, folder `/ (root)`, then **Save**.
-4. After a minute the site is live at `https://<your-username>.github.io/RoosterLive/`.
+1. In the repo, go to **Settings → Pages**.
+2. Under **Build and deployment**, choose **Deploy from a branch**, branch `main`, folder `/ (root)`, then **Save**.
+3. After a minute the site is live at `https://<your-username>.github.io/<repo>/`.
 
 GitHub Pages serves over HTTPS, which browsers require for camera access.
 
 ## Make it yours
 
-All settings are in [`js/config.js`](js/config.js):
+**Settings** — [`js/config.js`](js/config.js):
 
-- `streamId` — the broadcast's address on the PeerJS server. Change it to your own long random string; viewers and broadcaster must use the same one.
-- `coop.name`, `coop.latitude`, `coop.longitude`, `coop.timeZone` — used for the crow countdown and sunrise times.
-- `crowMinutesBeforeSunrise` — how early your roosters start.
-- `iceServers` — add a TURN server here if some viewers never get video (see Troubleshooting).
+- `siteName`, `trackName`, `timeZone`
+- `streamId` — change to your own long random string. All pages must share it, and anyone who knows it could broadcast under it.
+- `cameras` — your camera positions (add or remove entries).
+- `iceServers` — add a TURN server if some viewers never get video.
 
-**The flock:** edit [`data/flock.json`](data/flock.json). Put real photos in `images/flock/` (square images work best) and point `photo` at them.
+**Drivers** — [`data/racers.json`](data/racers.json): `id`, `name`, `number`, `car`, `class`, `color` (used on the leaderboard and lap buttons), `photo`, `personalBest` in seconds. Put photos in `images/racers/`.
 
-**The gallery:** use **Save snapshot** on the broadcast page, put the images in `images/gallery/`, and list them in [`data/gallery.json`](data/gallery.json):
+**Schedule** — [`data/schedule.json`](data/schedule.json): `id`, `name`, `class`, `start` (ISO time with offset, e.g. `2026-10-25T10:00:00+05:30`), `laps`, and `racers` (driver ids).
 
-```json
-[
-  { "src": "images/gallery/first-crow.jpg", "caption": "Sultan's first crow of the season", "date": "19 Oct 2026" }
-]
-```
+After editing, commit and push; GitHub Pages updates in about a minute. Reload race control after changing the schedule.
 
 ## Run it locally
-
-The pages load JSON files, so open them through a local server rather than double-clicking:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Then open http://localhost:8000 (viewer) and http://localhost:8000/broadcast.html (broadcaster). Browsers allow the camera on `localhost` without HTTPS.
+Open http://localhost:8000, http://localhost:8000/camera.html and http://localhost:8000/control.html. Browsers allow the camera on `localhost` without HTTPS.
 
 ## Troubleshooting
 
-- **"The coop is off air" even though I'm broadcasting** — check that `streamId` is identical on both sides (same `config.js`) and that the broadcast page says "You're live".
-- **"Another broadcast is already live with this stream ID"** — another tab or device is broadcasting. Close it, or wait a minute for the PeerJS server to release the ID.
-- **Some viewers connect to chat but never see video** — their network blocks direct peer-to-peer connections. Add a TURN server to `iceServers` (for example a free tier from metered.ca, or your own coturn server).
-- **Video freezes when the phone screen turns off** — browsers pause the camera in the background. Keep the page open and the screen on.
+- **"No cameras are live"** while a camera says it's live — check all pages use the same `config.js` (same `streamId`), then wait up to 8 seconds; viewers re-check automatically.
+- **"Another phone is already live as …"** — two phones chose the same position. Pick a different one.
+- **"Race control is already open on another device or tab"** — only one race control can run. Close the other one and reload.
+- **Chat works but no video** for some viewers — their network blocks peer-to-peer. Add a TURN server to `iceServers`.
+- **Video freezes when the phone screen turns off** — keep the camera page open with the screen on.
 
 ## Files
 
 ```
-index.html          viewer page
-broadcast.html      broadcaster page (not linked in navigation, marked noindex)
-css/style.css       styles
-js/config.js        your settings
-js/viewer.js        viewer connection, video and chat
-js/broadcast.js     camera capture, sending video, chat relay, snapshots
-js/chat-ui.js       shared chat rendering
-js/crow.js          crow countdown and sun arc
-js/sun.js           sunrise/sunset calculation
-js/content.js       flock and gallery rendering
-data/               flock.json, gallery.json
-images/             flock photos, gallery photos, favicon
+index.html, camera.html, control.html
+css/style.css
+js/config.js     settings
+js/viewer.js     viewer: camera switching, leaderboard, HUD, chat
+js/camera.js     camera capture and streaming
+js/control.js    race control: lap taps, race state, chat hub
+js/race.js       standings and time formatting (shared)
+js/content.js    schedule and driver sections
+js/chat-ui.js    chat rendering (shared)
+data/            racers.json, schedule.json
+images/          driver/car pictures, favicon
 ```
-
-## Good to know
-
-Anyone who finds `broadcast.html` could start a broadcast while yours is off. Using a long, private `streamId` makes that unlikely; viewers only ever see whoever holds that ID.
