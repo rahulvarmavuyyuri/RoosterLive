@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RoosterLive — live rooster cam</title>
+  <meta name="description" content="Watch our roosters live, chat with other viewers, and see when the next crow is due.">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;700&family=Rye&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="sign">
+    <div class="wrap">
+      <h1>RoosterLive</h1>
+      <p>Live from <span data-coop-name>the coop</span></p>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap stage">
+      <div class="screen">
+        <video id="video" playsinline autoplay muted></video>
+
+        <div class="badge-row">
+          <span class="badge" id="status-badge">Offline</span>
+          <span class="badge" id="viewer-badge" hidden></span>
+        </div>
+
+        <div class="screen-overlay" id="overlay">
+          <div>
+            <h2 id="overlay-title">Looking for the coop…</h2>
+            <p id="overlay-text">Connecting to the camera.</p>
+          </div>
+        </div>
+
+        <div class="screen-controls">
+          <button class="btn small" id="unmute" type="button" hidden>Turn sound on</button>
+          <button class="btn small" id="fullscreen" type="button">Full screen</button>
+        </div>
+      </div>
+
+      <section class="chat" aria-labelledby="chat-title">
+        <header>
+          <h2 id="chat-title">Coop chat</h2>
+          <span class="count" id="chat-count"></span>
+        </header>
+        <ul class="chat-log" id="chat-log" aria-live="polite"></ul>
+        <p class="chat-empty" id="chat-empty">No messages yet. Say hello once the stream is live.</p>
+        <form id="chat-form" autocomplete="off">
+          <div class="name-field">
+            <label class="visually-hidden" for="chat-name">Your name</label>
+            <input type="text" id="chat-name" placeholder="Your name" maxlength="24" required>
+          </div>
+          <label class="visually-hidden" for="chat-text">Message</label>
+          <input type="text" id="chat-text" placeholder="Write a message" maxlength="280" required disabled>
+          <button class="btn primary" type="submit" id="chat-send" disabled>Send</button>
+        </form>
+      </section>
+    </div>
+
+    <section class="section" id="crow" aria-labelledby="crow-title">
+      <div class="wrap crow">
+        <svg class="sun-arc" viewBox="0 0 600 260" role="img" aria-labelledby="arc-desc">
+          <desc id="arc-desc">The sun's path across today's sky at the coop, with its current position.</desc>
+          <path class="path" d="M40 220 A260 190 0 0 1 560 220"></path>
+          <line class="ground" x1="10" y1="220" x2="590" y2="220"></line>
+          <circle id="sun-dot" class="sun" cx="40" cy="220" r="16"></circle>
+          <text x="40" y="248" text-anchor="middle" id="arc-rise"></text>
+          <text x="560" y="248" text-anchor="middle" id="arc-set"></text>
+        </svg>
+        <div>
+          <h2 id="crow-title">Next big crow</h2>
+          <p class="countdown" id="countdown">--:--:--</p>
+          <dl class="times">
+            <dt>Expected at</dt><dd id="crow-at">—</dd>
+            <dt>Sunrise</dt><dd id="sunrise">—</dd>
+            <dt>Sunset</dt><dd id="sunset">—</dd>
+            <dt>Coop time</dt><dd id="coop-time">—</dd>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="flock-title">
+      <div class="wrap">
+        <h2 id="flock-title">Meet the flock</h2>
+        <p class="lede">Who you're watching, and how to tell them apart on camera.</p>
+        <ul class="flock" id="flock"></ul>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="gallery-title">
+      <div class="wrap">
+        <h2 id="gallery-title">Photos from the coop</h2>
+        <p class="lede">Favourite moments caught on camera.</p>
+        <ul class="gallery" id="gallery"></ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <span>Streamed live from <span data-coop-name>the coop</span></span>
+    </div>
+  </footer>
+
+  <dialog class="lightbox" id="lightbox">
+    <form method="dialog"><button class="btn small" type="submit">Close</button></form>
+    <figure style="margin:0">
+      <img id="lightbox-img" alt="">
+      <figcaption id="lightbox-cap"></figcaption>
+    </figure>
+  </dialog>
+
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/sun.js"></script>
+  <script src="js/chat-ui.js"></script>
+  <script src="js/crow.js"></script>
+  <script src="js/content.js"></script>
+  <script src="js/viewer.js"></script>
+</body>
+</html>

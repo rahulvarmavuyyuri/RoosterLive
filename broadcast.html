@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Broadcast — RoosterLive</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;700&family=Rye&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="sign">
+    <div class="wrap">
+      <h1>Go live</h1>
+      <p><a href="./">Open the viewer page</a></p>
+    </div>
+  </header>
+
+  <main class="wrap studio">
+    <div>
+      <div class="screen">
+        <video id="preview" playsinline autoplay muted></video>
+        <div class="badge-row">
+          <span class="badge" id="status-badge">Not live</span>
+          <span class="badge" id="viewer-badge" hidden></span>
+        </div>
+        <div class="screen-overlay" id="overlay">
+          <div>
+            <h2>Camera is off</h2>
+            <p>Point this phone or laptop at the coop, then start the broadcast.</p>
+          </div>
+        </div>
+      </div>
+
+      <section class="panel" aria-labelledby="controls-title">
+        <h2 id="controls-title">Broadcast</h2>
+        <p class="status-line" id="status-line">Ready when you are.</p>
+
+        <div class="field">
+          <label for="camera">Camera</label>
+          <select id="camera" disabled><option>Start to choose a camera</option></select>
+        </div>
+        <div class="field">
+          <label for="quality">Quality</label>
+          <select id="quality">
+            <option value="480">Standard (480p) — best for many viewers</option>
+            <option value="720" selected>HD (720p)</option>
+            <option value="1080">Full HD (1080p) — needs strong upload</option>
+          </select>
+          <p class="hint">Each viewer receives their own copy of the video from this device, so lower quality lets more people watch.</p>
+        </div>
+
+        <div class="row">
+          <button class="btn primary" id="start" type="button">Start broadcast</button>
+          <button class="btn" id="stop" type="button" disabled>Stop broadcast</button>
+          <button class="btn" id="mic" type="button" disabled>Mute sound</button>
+          <button class="btn" id="snapshot" type="button" disabled>Save snapshot</button>
+        </div>
+        <p class="hint">Keep this page open and the screen on while you're live. The page asks your device to stay awake.</p>
+      </section>
+    </div>
+
+    <section class="chat" aria-labelledby="chat-title">
+      <header>
+        <h2 id="chat-title">Coop chat</h2>
+        <span class="count" id="chat-count"></span>
+      </header>
+      <ul class="chat-log" id="chat-log" aria-live="polite"></ul>
+      <p class="chat-empty" id="chat-empty">Viewer messages show up here.</p>
+      <form id="chat-form" autocomplete="off">
+        <div class="name-field">
+          <label class="visually-hidden" for="chat-name">Host name</label>
+          <input type="text" id="chat-name" placeholder="Host name" maxlength="24" value="Coop keeper" required>
+        </div>
+        <label class="visually-hidden" for="chat-text">Message</label>
+        <input type="text" id="chat-text" placeholder="Write to viewers" maxlength="280" required disabled>
+        <button class="btn primary" type="submit" id="chat-send" disabled>Send</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/chat-ui.js"></script>
+  <script src="js/broadcast.js"></script>
+</body>
+</html>
