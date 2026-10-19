@@ -240,3 +240,9 @@ dialog.photo-view form { text-align: right; }
 .shared-list .m-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
 @media (max-width: 900px) { .manage-body { grid-template-columns: 1fr; } }
 @media (max-width: 520px) { .field-row { grid-template-columns: 1fr; } }
+
+.field-label { display: block; font-weight: 700; margin-bottom: 4px; }
+.variety-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { appearance: none; border: 2px solid var(--ink); background: var(--bg); color: var(--ink); border-radius: 999px; padding: 6px 12px; font: 700 0.85rem/1.2 var(--body); cursor: pointer; }
+.chip span { font-family: "Noto Sans Telugu", var(--body); font-weight: 600; }
+.chip[aria-pressed="true"] { background: var(--comb); border-color: var(--comb); color: #fff; }

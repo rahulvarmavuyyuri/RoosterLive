@@ -8,7 +8,7 @@
   <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Noto+Sans+Telugu:wght@600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -105,6 +105,11 @@
             <label for="m-photo">Photo</label>
             <input type="file" id="m-photo" accept="image/*">
             <img id="m-photo-preview" alt="" hidden>
+          </div>
+          <div class="field">
+            <span class="field-label" id="m-variety-label">Quick fill by variety</span>
+            <div class="variety-chips" id="m-varieties" role="group" aria-labelledby="m-variety-label"></div>
+            <p class="hint">Tap the variety that matches the bird. It fills in the Telugu name and plumage; you can change anything before saving.</p>
           </div>
           <div class="field-row">
             <div class="field"><label for="m-name">Name</label><input type="text" id="m-name" maxlength="40" required placeholder="e.g. Pingala"></div>

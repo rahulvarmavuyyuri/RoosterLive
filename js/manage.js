@@ -118,6 +118,36 @@
     img.src = url;
   });
 
+  // ---------- Quick fill by Andhra variety name ----------
+  // Names used in Andhra Pradesh for rooster plumage types, with what the words mean.
+  const VARIETIES = [
+    { en: "Kaki", te: "కాకి", plumage: "Crow-black plumage", about: "Black from head to tail, like a crow." },
+    { en: "Pacha Kaki", te: "పచ్చ కాకి", plumage: "Black with a green sheen", about: "Black feathers that shine green in the sun." },
+    { en: "Dega", te: "డేగ", plumage: "Hawk-streaked plumage", about: "Golden-brown feathers streaked like a hawk's." },
+    { en: "Yerra Dega", te: "ఎర్ర డేగ", plumage: "Red hawk-streaked plumage", about: "Reddish hawk-like streaked feathers." },
+    { en: "Kaki Dega", te: "కాకి డేగ", plumage: "Black body, golden neck", about: "Crow-black body with golden neck feathers." },
+    { en: "Nemali", te: "నెమలి", plumage: "Showy peacock-like plumage", about: "Bright, mixed colours like a peacock." },
+    { en: "Tella Nemali", te: "తెల్ల నెమలి", plumage: "White peacock-like plumage", about: "Mostly white with showy markings." },
+    { en: "Pingala", te: "పింగళ", plumage: "Red-brown plumage", about: "Deep red-brown, tawny feathers." },
+  ];
+
+  function renderVarieties() {
+    $("m-varieties").replaceChildren(...VARIETIES.map((v) => {
+      const b = Object.assign(document.createElement("button"), { type: "button", className: "chip" });
+      b.append(v.en, Object.assign(document.createElement("span"), { lang: "te", textContent: " " + v.te }));
+      b.addEventListener("click", () => {
+        if (!$("m-name").value.trim()) $("m-name").value = v.en;
+        $("m-te").value = v.te;
+        $("m-breed").value = v.plumage;
+        if (!$("m-about").value.trim()) $("m-about").value = v.about;
+        [...$("m-varieties").children].forEach((c) => c.setAttribute("aria-pressed", String(c === b)));
+        say("m-status-line", `Filled in ${v.en} (${v.te}). Check the details, then save.`, "ok");
+      });
+      b.setAttribute("aria-pressed", "false");
+      return b;
+    }));
+  }
+
   // ---------- Form ----------
   const fields = { name: "m-name", nameTe: "m-te", breed: "m-breed", age: "m-age", weight: "m-weight", comb: "m-comb", bloodline: "m-line", about: "m-about" };
 
@@ -130,6 +160,7 @@
 
   function resetForm() {
     $("m-form").reset();
+    [...$("m-varieties").children].forEach((c) => c.setAttribute("aria-pressed", "false"));
     $("m-id").value = "";
     photoData = null;
     $("m-photo-preview").hidden = true;
@@ -242,6 +273,7 @@
   }
 
   renderKey();
+  renderVarieties();
   fetch(FLOCK, { cache: "no-cache" })
     .then((r) => r.json())
     .then((list) => { flock = list; renderList(); })
