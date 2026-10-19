@@ -17,6 +17,9 @@
   let wakeLock = null;
   let micOn = true;
   const viewers = new Map(); // peerId -> { conn, call }
+  const passInput = $("pass");
+  let passKey = "";
+  try { passInput.value = localStorage.getItem("farm-viewer-pass") || ""; } catch { /* ignore */ }
 
   const params = new URLSearchParams(location.search);
   let savedSlot = params.get("cam");
@@ -118,6 +121,12 @@
 
   function onViewer(conn) {
     conn.on("open", () => {
+      // Only viewers who entered the right password get video.
+      if (!conn.metadata || conn.metadata.key !== passKey) {
+        try { conn.send({ type: "denied" }); } catch { /* ignore */ }
+        setTimeout(() => conn.close(), 800);
+        return;
+      }
       viewers.set(conn.peer, { conn, call: null });
       updateCount();
     });
@@ -161,6 +170,15 @@
       status("This browser can't use the camera. Open the page over https in Chrome, Safari or Firefox.", "err");
       return;
     }
+    const pass = passInput.value.trim();
+    if (pass.length < 4) {
+      status("Set a viewer password of at least 4 characters first.", "err");
+      passInput.focus();
+      return;
+    }
+    passKey = pass;
+    try { localStorage.setItem("farm-viewer-pass", pass); } catch { /* ignore */ }
+    passInput.disabled = true;
     const slot = slotSel.value;
     const label = cfg.cameras.find((c) => c.id === slot)?.label || slot;
     try { localStorage.setItem("farm-cam-slot", slot); } catch { /* ignore */ }
@@ -171,6 +189,7 @@
       stream = await openCamera();
     } catch (err) {
       startBtn.disabled = false;
+      passInput.disabled = false;
       status(err.name === "NotAllowedError"
         ? "Camera access was blocked. Allow camera and microphone for this site, then try again."
         : "Couldn't open the camera: " + err.message, "err");
@@ -216,6 +235,7 @@
     $("viewer-badge").hidden = true;
     micBtn.disabled = true;
     deviceSel.disabled = true;
+    passInput.disabled = false;
     setLive(false);
     if (keepStatus !== true) status("Camera stopped.");
   }

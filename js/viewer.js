@@ -17,6 +17,7 @@
   let hubConn = null;
   let hubRetry = null;
   let spotlight = { bird: null, camera: null };
+  let accessKey = store.get("viewer-pass") || "";
 
   const cams = new Map(cfg.cameras.map((c) => [c.id, { ...c, conn: null, online: false, retry: null, tab: null }]));
   const peerToCam = new Map(cfg.cameras.map((c) => [ids.camera(c.id), c.id]));
@@ -98,8 +99,9 @@
     clearTimeout(cam.retry);
     if (!peer || peer.destroyed) return;
     if (peer.disconnected) { cam.retry = setTimeout(() => probe(cam), 8000); return; }
-    const c = peer.connect(ids.camera(cam.id), { reliable: true });
+    const c = peer.connect(ids.camera(cam.id), { reliable: true, metadata: { key: accessKey } });
     cam.conn = c;
+    c.on("data", (msg) => { if (cam.conn === c && msg && msg.type === "denied") denied(); });
     c.on("open", () => {
       if (cam.conn !== c) return;
       cam.online = true;
@@ -136,7 +138,7 @@
     clearTimeout(hubRetry);
     if (!peer || peer.destroyed) return;
     if (peer.disconnected) { hubRetry = setTimeout(connectHub, 8000); return; }
-    const c = peer.connect(ids.hub(), { reliable: true });
+    const c = peer.connect(ids.hub(), { reliable: true, metadata: { key: accessKey } });
     hubConn = c;
     const current = () => hubConn === c;
 
@@ -149,6 +151,7 @@
     c.on("data", (msg) => {
       if (!current() || !msg || typeof msg !== "object") return;
       switch (msg.type) {
+        case "denied": denied(); return;
         case "history": chat.reset(Array.isArray(msg.messages) ? msg.messages : []); break;
         case "chat":
         case "system": chat.add(msg); break;
@@ -241,6 +244,48 @@
     });
   }
 
+  // ---------- Password gate ----------
+  function showGate(error) {
+    $("gate-error").textContent = error || "";
+    $("gate-error").hidden = !error;
+    $("gate").hidden = false;
+    $("gate-pass").value = "";
+    setTimeout(() => $("gate-pass").focus(), 50);
+  }
+
+  // A camera or the host rejected our password: stop everything and ask again.
+  function denied() {
+    if (!peer) return;
+    accessKey = "";
+    store.set("viewer-pass", "");
+    for (const cam of cams.values()) { clearTimeout(cam.retry); cam.conn = null; cam.online = false; }
+    clearTimeout(hubRetry);
+    hubConn = null;
+    $("chat-text").disabled = true;
+    $("chat-send").disabled = true;
+    $("viewer-badge").hidden = true;
+    $("chat-count").textContent = "";
+    if (mediaCall) { mediaCall.close(); mediaCall = null; }
+    video.srcObject = null;
+    const p = peer;
+    peer = null;
+    p.destroy();
+    renderTabs();
+    setLiveBadge(false);
+    showOverlay("Password needed", "Enter the farm's password to watch.");
+    showGate("That password didn't work. Ask the farm for the current one.");
+  }
+
+  $("gate-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const key = $("gate-pass").value.trim();
+    if (key.length < 4) { showGate("The password has at least 4 characters."); return; }
+    accessKey = key;
+    store.set("viewer-pass", key);
+    $("gate").hidden = true;
+    if (!peer && typeof Peer !== "undefined") startPeer();
+  });
+
   // ---------- Controls ----------
   $("unmute").addEventListener("click", () => {
     video.muted = false;
@@ -271,6 +316,9 @@
   window.FarmData.ready.then(renderSpotlight);
   if (typeof Peer === "undefined") {
     showOverlay("Video player didn't load", "A script was blocked. Turn off content blockers for this page and reload.");
+  } else if (!accessKey) {
+    showOverlay("Password needed", "Enter the farm's password to watch.");
+    showGate();
   } else {
     startPeer();
   }

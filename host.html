@@ -46,6 +46,14 @@
         </header>
         <div class="panel-body">
           <p class="status-line" id="status-line">Connecting…</p>
+          <div class="field">
+            <label for="pass">Viewer password</label>
+            <div class="row">
+              <input type="text" id="pass" minlength="4" maxlength="64" autocomplete="off" placeholder="At least 4 characters" style="flex:1 1 160px">
+              <button class="btn" id="pass-save" type="button">Save password</button>
+            </div>
+            <p class="hint">Use the same password as on the camera phones. Changing it disconnects everyone until they enter the new one.</p>
+          </div>
           <p class="hint">Keep this page open while you're live. It runs the chat and tells viewers which bird they're watching.</p>
         </div>
       </section>

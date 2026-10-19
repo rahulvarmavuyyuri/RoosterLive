@@ -179,3 +179,11 @@ html[data-bg]:not([data-bg="none"]) .section .lede,
 html[data-bg]:not([data-bg="none"]) .sign p { text-shadow: 0 1px 0 var(--panel); }
 html[data-bg]:not([data-bg="none"]) .bird { background: color-mix(in srgb, var(--panel) 88%, transparent); padding: 14px; border-radius: 8px; }
 html[data-bg]:not([data-bg="none"]) .day { background: color-mix(in srgb, var(--panel) 88%, transparent); padding: 0 14px; border-radius: 0 0 8px 8px; }
+
+/* ---------- Password gate (viewer page) ---------- */
+.gate { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; background: color-mix(in srgb, var(--bg) 82%, transparent); }
+.gate-card { width: min(420px, 100%); background: var(--panel); border: 2px solid var(--ink); border-radius: 12px; padding: 24px; display: grid; gap: 12px; box-shadow: 0 12px 40px rgb(0 0 0 / .2); }
+.gate-card h2 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 2rem; line-height: 1.1; color: var(--comb); }
+.gate-card p { margin: 0; }
+.gate-card input { width: 100%; font: inherit; color: var(--ink); background: var(--bg); border: 2px solid var(--muted); border-radius: 6px; padding: 10px 12px; }
+.gate-error { color: var(--comb); font-weight: 700; }

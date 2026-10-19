@@ -12,6 +12,9 @@
   let byId = {};
   let peer = null;
   const viewers = new Map(); // peerId -> { conn, lastMsg }
+  let passKey = "";
+  try { passKey = localStorage.getItem("farm-viewer-pass") || ""; } catch { /* ignore */ }
+  $("pass").value = passKey;
 
   // Saved so a page refresh keeps chat history and the spotlight.
   let state = { spotlight: { bird: null, camera: null }, history: [] };
@@ -96,6 +99,11 @@
   // ---------- Hub ----------
   function onViewer(conn) {
     conn.on("open", () => {
+      if (!conn.metadata || conn.metadata.key !== passKey) {
+        try { conn.send({ type: "denied" }); } catch { /* ignore */ }
+        setTimeout(() => conn.close(), 800);
+        return;
+      }
       viewers.set(conn.peer, { conn, lastMsg: 0 });
       conn.send({ type: "history", messages: state.history });
       conn.send(spotlightMessage());
@@ -163,6 +171,18 @@
     .catch((err) => status("Couldn't load data/flock.json: " + err.message, "err"));
   chat.reset(state.history);
 
+  $("pass-save").addEventListener("click", () => {
+    const pass = $("pass").value.trim();
+    if (pass.length < 4) { status("The viewer password needs at least 4 characters.", "err"); $("pass").focus(); return; }
+    const changed = pass !== passKey;
+    passKey = pass;
+    try { localStorage.setItem("farm-viewer-pass", pass); } catch { /* ignore */ }
+    if (changed) for (const v of viewers.values()) v.conn.close(); // everyone re-enters the new password
+    if (!peer && typeof Peer !== "undefined") goOnline();
+    else status("Password saved. Online.", "ok");
+  });
+
   if (typeof Peer === "undefined") status("The streaming library didn't load. Check your connection and reload.", "err");
+  else if (passKey.length < 4) status("Set a viewer password to go online.", "err");
   else goOnline();
 })();
