@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Farm camera — RoosterLive</title>
+  <title>Camera and host — RoosterLive</title>
   <meta name="robots" content="noindex">
   <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Noto+Sans+Telugu:wght@600&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header class="sign">
     <div class="wrap">
-      <h1>Farm camera</h1>
-      <p><a href="host.html">Host page</a></p>
+      <h1>Camera and host</h1>
+      <p><a href="./">Viewer page</a></p>
     </div>
   </header>
 
@@ -34,42 +34,92 @@
           </div>
         </div>
       </div>
+
+      <section class="panel" aria-labelledby="spot-title">
+        <header>
+          <h2 id="spot-title">Who's on camera?</h2>
+          <span class="meta" id="spot-meta">Nobody in the spotlight</span>
+        </header>
+        <div class="panel-body">
+          <div class="field">
+            <label for="spot-cam">Camera they're on</label>
+            <select id="spot-cam"></select>
+            <p class="hint">Viewers who haven't picked a camera themselves switch to this one.</p>
+          </div>
+          <div class="pick-grid" id="picks"></div>
+          <div class="row" style="margin-top:14px">
+            <button class="btn" id="clear" type="button">Clear spotlight</button>
+          </div>
+        </div>
+      </section>
     </div>
 
-    <section class="panel" aria-labelledby="cam-title">
-      <header><h2 id="cam-title">This camera</h2></header>
-      <div class="panel-body">
-        <p class="status-line" id="status-line">Ready when you are.</p>
-        <div class="field">
-          <label for="pass">Viewer password</label>
-          <input type="text" id="pass" minlength="4" maxlength="64" autocomplete="off" placeholder="At least 4 characters">
-          <p class="hint">Friends need this password to watch. Use the same one on every camera phone and on the host page.</p>
+    <div class="side">
+      <section class="panel" aria-labelledby="cam-title">
+        <header><h2 id="cam-title">This camera</h2></header>
+        <div class="panel-body">
+          <p class="status-line" id="status-line">Ready when you are.</p>
+          <div class="field">
+            <label for="pass">Viewer password</label>
+            <input type="text" id="pass" minlength="4" maxlength="64" autocomplete="off" placeholder="At least 4 characters">
+            <p class="hint">Friends need this password to watch. Use the same one on every camera phone and on the host page.</p>
+          </div>
+          <div class="field">
+            <label for="slot">Spot on the farm</label>
+            <select id="slot"></select>
+          </div>
+          <div class="field">
+            <label for="device">Camera</label>
+            <select id="device" disabled><option>Go live to choose a camera</option></select>
+          </div>
+          <div class="field">
+            <label for="quality">Quality</label>
+            <select id="quality">
+              <option value="480">Standard (480p), best for many viewers</option>
+              <option value="720" selected>HD (720p)</option>
+              <option value="1080">Full HD (1080p), needs strong upload</option>
+            </select>
+            <p class="hint">Each viewer watching this camera gets their own copy of the video from this phone.</p>
+          </div>
+          <div class="row">
+            <button class="btn primary" id="start" type="button">Go live</button>
+            <button class="btn" id="stop" type="button" disabled>Stop</button>
+            <button class="btn" id="mic" type="button" disabled>Mute sound</button>
+          </div>
+          <p class="hint">Keep this page open with the screen on, and plug the phone into power.</p>
         </div>
-        <div class="field">
-          <label for="slot">Spot on the farm</label>
-          <select id="slot"></select>
+      </section>
+
+      <section class="panel" aria-labelledby="host-title">
+        <header>
+          <h2 id="host-title">Host</h2>
+          <span class="meta" id="viewer-count"></span>
+        </header>
+        <div class="panel-body">
+          <label class="switch" for="host-toggle">
+            <input type="checkbox" id="host-toggle">
+            <span>Run chat and spotlight from this phone</span>
+          </label>
+          <p class="hint">Turn this on for one phone only. It uses the viewer password above.</p>
+          <p class="status-line" id="h-status">Off.</p>
         </div>
-        <div class="field">
-          <label for="device">Camera</label>
-          <select id="device" disabled><option>Go live to choose a camera</option></select>
-        </div>
-        <div class="field">
-          <label for="quality">Quality</label>
-          <select id="quality">
-            <option value="480">Standard (480p), best for many viewers</option>
-            <option value="720" selected>HD (720p)</option>
-            <option value="1080">Full HD (1080p), needs strong upload</option>
-          </select>
-          <p class="hint">Each viewer watching this camera gets their own copy of the video from this phone.</p>
-        </div>
-        <div class="row">
-          <button class="btn primary" id="start" type="button">Go live</button>
-          <button class="btn" id="stop" type="button" disabled>Stop</button>
-          <button class="btn" id="mic" type="button" disabled>Mute sound</button>
-        </div>
-        <p class="hint">Keep this page open with the screen on, and plug the phone into power.</p>
-      </div>
-    </section>
+      </section>
+
+      <section class="panel chat" aria-labelledby="chat-title" hidden>
+        <header><h2 id="chat-title">Yard chat</h2></header>
+        <ul class="chat-log" id="chat-log" aria-live="polite"></ul>
+        <p class="chat-empty" id="chat-empty">Viewer messages show up here.</p>
+        <form id="chat-form" autocomplete="off">
+          <div class="name-field">
+            <label class="visually-hidden" for="chat-name">Host name</label>
+            <input type="text" id="chat-name" placeholder="Host name" maxlength="24" value="Farm" required>
+          </div>
+          <label class="visually-hidden" for="chat-text">Message</label>
+          <input type="text" id="chat-text" placeholder="Write to viewers" maxlength="280" required disabled>
+          <button class="btn primary" type="submit" id="chat-send" disabled>Send</button>
+        </form>
+      </section>
+    </div>
 
     <section class="panel share" aria-labelledby="share-title">
       <header><h2 id="share-title">Share a photo</h2><span class="meta" id="share-count"></span></header>
@@ -88,10 +138,89 @@
         <ul class="shared-list" id="share-list"></ul>
       </div>
     </section>
+    <section class="panel manage" aria-labelledby="manage-title">
+      <header><h2 id="manage-title">Manage the flock</h2><span class="meta" id="m-count"></span></header>
+      <div class="panel-body manage-body">
+        <div class="manage-key">
+          <h3>GitHub key</h3>
+          <p class="hint">The host page needs a key to save birds to your site. It stays only on this device.</p>
+          <div class="row">
+            <label class="visually-hidden" for="m-token">GitHub key</label>
+            <input type="password" id="m-token" autocomplete="off" placeholder="Paste your key (github_pat_…)" style="flex:1 1 220px">
+            <button class="btn" id="m-token-save" type="button">Save key</button>
+            <button class="btn small" id="m-token-forget" type="button">Forget key</button>
+          </div>
+          <details class="hint">
+            <summary>How to get a key (one time)</summary>
+            <ol>
+              <li>Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a> and sign in.</li>
+              <li>Name it "RoosterLive host" and pick an expiry date.</li>
+              <li>Under <b>Repository access</b>, choose <b>Only select repositories</b> and pick <b>RoosterLive</b>.</li>
+              <li>Under <b>Permissions → Repository permissions</b>, set <b>Contents</b> to <b>Read and write</b>.</li>
+              <li>Tap <b>Generate token</b>, copy it, paste it above and tap <b>Save key</b>.</li>
+            </ol>
+          </details>
+          <p class="status-line" id="m-key-status" hidden></p>
+        </div>
+
+        <form class="manage-form" id="m-form" autocomplete="off">
+          <h3 id="m-form-title">Add a bird</h3>
+          <input type="hidden" id="m-id">
+          <div class="field">
+            <label for="m-photo">Photo</label>
+            <input type="file" id="m-photo" accept="image/*">
+            <img id="m-photo-preview" alt="" hidden>
+          </div>
+          <div class="field">
+            <span class="field-label" id="m-variety-label">Quick fill by variety</span>
+            <div class="variety-chips" id="m-varieties" role="group" aria-labelledby="m-variety-label"></div>
+            <p class="hint">Tap the variety that matches the bird. It fills in the Telugu name and plumage; you can change anything before saving.</p>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="m-name">Name</label><input type="text" id="m-name" maxlength="40" required placeholder="e.g. Pingala"></div>
+            <div class="field"><label for="m-te">Telugu name</label><input type="text" id="m-te" maxlength="40" lang="te" placeholder="e.g. పింగళ"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="m-breed">Plumage / breed</label><input type="text" id="m-breed" maxlength="60" placeholder="e.g. Red-brown plumage"></div>
+            <div class="field"><label for="m-price">Price (₹)</label><input type="number" id="m-price" min="0" step="100" inputmode="numeric" placeholder="Leave empty for 'on request'"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="m-age">Age</label><input type="text" id="m-age" maxlength="30" placeholder="e.g. 2 years"></div>
+            <div class="field"><label for="m-weight">Weight</label><input type="text" id="m-weight" maxlength="30" placeholder="e.g. 3.5 kg"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="m-comb">Comb</label><input type="text" id="m-comb" maxlength="30" placeholder="e.g. Pea comb"></div>
+            <div class="field"><label for="m-line">Bloodline</label><input type="text" id="m-line" maxlength="80" placeholder="e.g. Sire: Raja, Dam: Meena"></div>
+          </div>
+          <div class="field"><label for="m-about">About</label><input type="text" id="m-about" maxlength="200" placeholder="One or two lines about this bird"></div>
+          <div class="field">
+            <label for="m-status">Sale status</label>
+            <select id="m-status">
+              <option value="sale">For sale</option>
+              <option value="keep">Not for sale</option>
+              <option value="none">Don't show a status</option>
+            </select>
+          </div>
+          <div class="row">
+            <button class="btn primary" type="submit" id="m-save">Save bird</button>
+            <button class="btn" type="button" id="m-cancel" hidden>Cancel edit</button>
+          </div>
+          <p class="status-line" id="m-status-line" hidden></p>
+        </form>
+
+        <div class="manage-list">
+          <h3>Birds on the site</h3>
+          <ul class="shared-list" id="m-list"></ul>
+        </div>
+      </div>
+    </section>
   </main>
 
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/camera.js"></script>
+  <script src="js/chat-ui.js"></script>
+  <script src="js/host.js"></script>
+  <script src="js/manage.js"></script>
 </body>
 </html>

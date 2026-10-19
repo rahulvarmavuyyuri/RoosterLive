@@ -14,7 +14,7 @@
   const viewers = new Map(); // peerId -> { conn, lastMsg }
   let passKey = "";
   try { passKey = localStorage.getItem("farm-viewer-pass") || ""; } catch { /* ignore */ }
-  $("pass").value = passKey;
+  if ($("h-pass")) $("h-pass").value = passKey;
 
   // Saved so a page refresh keeps chat history and the spotlight.
   let state = { spotlight: { bird: null, camera: null }, history: [] };
@@ -27,8 +27,8 @@
   $("chat-name").value = store.get("host-name") || $("chat-name").value;
 
   function status(text, kind) {
-    $("status-line").textContent = text;
-    $("status-line").className = "status-line" + (kind ? " " + kind : "");
+    $("h-status").textContent = text;
+    $("h-status").className = "status-line" + (kind ? " " + kind : "");
   }
 
   function sendAll(msg) {
@@ -175,18 +175,67 @@
     .catch((err) => status("Couldn't load data/flock.json: " + err.message, "err"));
   chat.reset(state.history);
 
-  $("pass-save").addEventListener("click", () => {
-    const pass = $("pass").value.trim();
-    if (pass.length < 4) { status("The viewer password needs at least 4 characters.", "err"); $("pass").focus(); return; }
-    const changed = pass !== passKey;
-    passKey = pass;
-    try { localStorage.setItem("farm-viewer-pass", pass); } catch { /* ignore */ }
-    if (changed) for (const v of viewers.values()) v.conn.close(); // everyone re-enters the new password
-    if (!peer && typeof Peer !== "undefined") goOnline();
-    else status("Password saved. Online.", "ok");
-  });
+  function goOffline() {
+    for (const v of viewers.values()) v.conn.close();
+    viewers.clear();
+    if (peer) { peer.destroy(); peer = null; }
+    $("chat-text").disabled = true;
+    $("chat-send").disabled = true;
+    $("viewer-count").textContent = "";
+  }
 
-  if (typeof Peer === "undefined") status("The streaming library didn't load. Check your connection and reload.", "err");
-  else if (passKey.length < 4) status("Set a viewer password to go online.", "err");
-  else goOnline();
+  const toggle = $("host-toggle");
+  if (toggle) {
+    // Combined camera + host page: the switch decides if this phone is the host.
+    // It uses the same viewer password as the camera on this page.
+    const passInput = $("pass");
+    function setHost(on) {
+      if (on) {
+        const pass = (passInput && passInput.value.trim()) || passKey;
+        if (pass.length < 4) {
+          toggle.checked = false;
+          status("Set the viewer password above first (at least 4 characters).", "err");
+          if (passInput) passInput.focus();
+          return;
+        }
+        passKey = pass;
+        try { localStorage.setItem("farm-viewer-pass", pass); localStorage.setItem("host-on", "1"); } catch { /* ignore */ }
+        if (!peer && typeof Peer !== "undefined") { status("Connecting…"); goOnline(); }
+      } else {
+        try { localStorage.setItem("host-on", "0"); } catch { /* ignore */ }
+        goOffline();
+        status("Off. Turn this on for one phone so viewers get chat and the spotlight.");
+      }
+    }
+    toggle.addEventListener("change", () => setHost(toggle.checked));
+    // Keep the host password in step if it's changed on this page.
+    if (passInput) passInput.addEventListener("change", () => {
+      const pass = passInput.value.trim();
+      if (peer && pass.length >= 4 && pass !== passKey) {
+        passKey = pass;
+        try { localStorage.setItem("farm-viewer-pass", pass); } catch { /* ignore */ }
+        for (const v of viewers.values()) v.conn.close();
+      }
+    });
+    let wasOn = false;
+    try { wasOn = localStorage.getItem("host-on") === "1"; } catch { /* ignore */ }
+    toggle.checked = wasOn;
+    if (typeof Peer === "undefined") status("The streaming library didn't load. Check your connection and reload.", "err");
+    else setHost(wasOn);
+  } else {
+    $("h-pass-save").addEventListener("click", () => {
+      const pass = $("h-pass").value.trim();
+      if (pass.length < 4) { status("The viewer password needs at least 4 characters.", "err"); $("h-pass").focus(); return; }
+      const changed = pass !== passKey;
+      passKey = pass;
+      try { localStorage.setItem("farm-viewer-pass", pass); } catch { /* ignore */ }
+      if (changed) for (const v of viewers.values()) v.conn.close(); // everyone re-enters the new password
+      if (!peer && typeof Peer !== "undefined") goOnline();
+      else status("Password saved. Online.", "ok");
+    });
+
+    if (typeof Peer === "undefined") status("The streaming library didn't load. Check your connection and reload.", "err");
+    else if (passKey.length < 4) status("Set a viewer password to go online.", "err");
+    else goOnline();
+  }
 })();

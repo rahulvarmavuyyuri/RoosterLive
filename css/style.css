@@ -246,3 +246,9 @@ dialog.photo-view form { text-align: right; }
 .chip { appearance: none; border: 2px solid var(--ink); background: var(--bg); color: var(--ink); border-radius: 999px; padding: 6px 12px; font: 700 0.85rem/1.2 var(--body); cursor: pointer; }
 .chip span { font-family: "Noto Sans Telugu", var(--body); font-weight: 600; }
 .chip[aria-pressed="true"] { background: var(--comb); border-color: var(--comb); color: #fff; }
+
+/* Combined camera + host page */
+.switch { display: flex; align-items: center; gap: 10px; font-weight: 700; cursor: pointer; }
+.switch input { width: 22px; height: 22px; accent-color: var(--comb); }
+.ops > div > .panel, .ops > .side > .panel { margin-top: 0; }
+.ops > div:first-child { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
