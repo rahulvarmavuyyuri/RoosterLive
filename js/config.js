@@ -22,6 +22,11 @@ window.SITE_CONFIG = {
     { urls: "stun:stun1.l.google.com:19302" },
   ],
 
+  // Animated 3D background on the viewer page:
+  // "feathers" (drifting feathers), "hills" (farm hills at sunrise),
+  // "field" (swaying grain field) or "none".
+  background: "feathers",
+
   chat: { maxLength: 280, historySize: 50 },
 };
 
