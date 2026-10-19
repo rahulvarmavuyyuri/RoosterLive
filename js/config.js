@@ -28,6 +28,12 @@ window.SITE_CONFIG = {
   background: "feathers",
 
   chat: { maxLength: 280, historySize: 50 },
+
+  // Selling: shown on the "Compare birds" panel.
+  currency: "₹",
+  // WhatsApp number with country code, digits only, e.g. "919876543210".
+  // Leave empty to hide the "Ask to buy" buttons.
+  whatsapp: "",
 };
 
 // Peer IDs derived from streamId — don't edit.

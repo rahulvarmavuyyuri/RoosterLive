@@ -5,7 +5,8 @@
     "breed": "Red-brown plumage",
     "about": "Deep mahogany-red feathers with darker wings, a small pea comb and a tall, upright stance.",
     "photo": "images/flock/rooster-1.jpg",
-    "nameTe": "పింగళ"
+    "nameTe": "పింగళ",
+    "price": null
   },
   {
     "id": "rooster-2",
@@ -13,7 +14,8 @@
     "breed": "Hawk-streaked plumage",
     "about": "Golden hackles finely streaked with brown like a hawk's feathers, and a bright red face.",
     "photo": "images/flock/rooster-2.jpg",
-    "nameTe": "డేగ"
+    "nameTe": "డేగ",
+    "price": null
   },
   {
     "id": "rooster-3",
@@ -21,7 +23,8 @@
     "breed": "Showy laced plumage",
     "about": "Straw-gold hackles over black-and-white laced body feathers, here showing off a full wing stretch.",
     "photo": "images/flock/rooster-3.jpg",
-    "nameTe": "నెమలి"
+    "nameTe": "నెమలి",
+    "price": null
   },
   {
     "id": "rooster-4",
@@ -29,6 +32,7 @@
     "breed": "Black body, golden neck",
     "about": "Glossy crow-black body with a long straw-gold hackle and pale legs.",
     "photo": "images/flock/rooster-4.jpg",
-    "nameTe": "కాకి డేగ"
+    "nameTe": "కాకి డేగ",
+    "price": null
   }
 ]

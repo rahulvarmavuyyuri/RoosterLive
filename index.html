@@ -61,7 +61,16 @@
           <p class="spot-empty" id="spot-empty">When the host puts a bird in front of the camera, you'll see who it is here.</p>
         </section>
 
-        <section class="panel chat" aria-labelledby="chat-title">
+        <section class="panel compare" aria-labelledby="compare-title">
+          <header>
+            <h2 id="compare-title">Compare birds</h2>
+            <span class="meta">Pick any two</span>
+          </header>
+          <div class="compare-grid" id="compare"></div>
+          <p class="compare-note" id="compare-note"></p>
+        </section>
+
+        <section class="panel chat" aria-labelledby="chat-title" hidden>
           <header>
             <h2 id="chat-title">Yard chat</h2>
             <span class="meta" id="chat-count"></span>
@@ -107,6 +116,7 @@
   <script src="js/chat-ui.js"></script>
   <script src="js/content.js"></script>
   <script src="js/viewer.js"></script>
+  <script src="js/compare.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="js/background.js"></script>
 </body>

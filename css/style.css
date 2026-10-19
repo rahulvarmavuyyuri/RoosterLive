@@ -190,3 +190,18 @@ html[data-bg]:not([data-bg="none"]) .day { background: color-mix(in srgb, var(--
 
 /* Telugu names next to the English ones */
 .name-te { font-family: "Noto Sans Telugu", var(--body); font-weight: 600; font-size: 0.8em; color: var(--muted); }
+
+/* ---------- Compare birds (viewer page) ---------- */
+.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px; }
+.cmp { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.cmp select { font-weight: 700; padding: 6px 8px; }
+.cmp img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: center 35%; border: 3px solid var(--ink); border-radius: 10px; background: var(--bg); }
+.cmp h3 { margin: 0; font-family: var(--display); font-size: 1.2rem; line-height: 1.15; overflow-wrap: anywhere; }
+.cmp .price { font-family: var(--display); font-weight: 700; font-size: 1.25rem; color: var(--comb); }
+.cmp .price.ask { font-size: 0.95rem; }
+.cmp dl { display: grid; grid-template-columns: auto 1fr; gap: 1px 8px; margin: 0; font-size: 0.8rem; }
+.cmp dt { color: var(--muted); }
+.cmp dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+.cmp .btn { text-align: center; text-decoration: none; font-size: 0.9rem; padding: 9px 10px; }
+.compare-note { margin: 0; padding: 0 12px 12px; font-size: 0.8rem; color: var(--muted); }
+.compare-note:empty { display: none; }
