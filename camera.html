@@ -70,6 +70,24 @@
         <p class="hint">Keep this page open with the screen on, and plug the phone into power.</p>
       </div>
     </section>
+
+    <section class="panel share" aria-labelledby="share-title">
+      <header><h2 id="share-title">Share a photo</h2><span class="meta" id="share-count"></span></header>
+      <div class="panel-body">
+        <div class="field">
+          <label for="share-caption">Caption (optional)</label>
+          <input type="text" id="share-caption" maxlength="80" autocomplete="off" placeholder="e.g. Pingala after his morning bath">
+        </div>
+        <div class="row">
+          <button class="btn primary" id="share-snap" type="button" disabled>Snap from camera</button>
+          <label class="btn" for="share-file" id="share-pick">Choose photo</label>
+          <input type="file" id="share-file" accept="image/*" class="visually-hidden">
+        </div>
+        <p class="hint">Photos go to friends watching right now, and to anyone who joins while this camera is live. They disappear when you stop the camera.</p>
+        <p class="status-line" id="share-status" hidden></p>
+        <ul class="shared-list" id="share-list"></ul>
+      </div>
+    </section>
   </main>
 
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>

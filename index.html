@@ -90,6 +90,20 @@
       </div>
     </div>
 
+    <section class="section" aria-labelledby="photos-title" id="photos-section" hidden>
+      <div class="wrap">
+        <h2 id="photos-title">Photos from the farm</h2>
+        <p class="lede">Shared live from the farm cameras. Tap a photo to see it bigger.</p>
+        <ul class="photo-grid" id="photo-grid"></ul>
+      </div>
+    </section>
+
+    <dialog class="photo-view" id="photo-view">
+      <form method="dialog"><button class="btn small" type="submit">Close</button></form>
+      <img id="photo-view-img" alt="">
+      <p id="photo-view-cap"></p>
+    </dialog>
+
     <section class="section" aria-labelledby="flock-title">
       <div class="wrap">
         <h2 id="flock-title">Meet the flock</h2>

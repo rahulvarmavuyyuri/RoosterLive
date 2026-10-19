@@ -101,7 +101,11 @@
     if (peer.disconnected) { cam.retry = setTimeout(() => probe(cam), 8000); return; }
     const c = peer.connect(ids.camera(cam.id), { reliable: true, metadata: { key: accessKey } });
     cam.conn = c;
-    c.on("data", (msg) => { if (cam.conn === c && msg && msg.type === "denied") denied(); });
+    c.on("data", (msg) => {
+      if (cam.conn !== c || !msg) return;
+      if (msg.type === "denied") denied();
+      else if (msg.type === "photos" && Array.isArray(msg.photos)) setPhotos(cam.id, msg.photos);
+    });
     c.on("open", () => {
       if (cam.conn !== c) return;
       cam.online = true;
@@ -243,6 +247,35 @@
       console.error("PeerJS error", err);
     });
   }
+
+  // ---------- Photos shared from the cameras ----------
+  const photosByCam = {};
+  function setPhotos(camId, list) {
+    photosByCam[camId] = list
+      .filter((p) => p && typeof p.src === "string" && p.src.startsWith("data:image/"))
+      .slice(0, 12)
+      .map((p) => ({ src: p.src, caption: String(p.caption || "").slice(0, 80), ts: Number(p.ts) || 0 }));
+    renderPhotos();
+  }
+  function renderPhotos() {
+    const all = Object.values(photosByCam).flat().sort((a, b) => b.ts - a.ts);
+    $("photos-section").hidden = all.length === 0;
+    $("photo-grid").replaceChildren(...all.map((p) => {
+      const li = document.createElement("li");
+      const btn = Object.assign(document.createElement("button"), { type: "button" });
+      btn.append(Object.assign(document.createElement("img"), { src: p.src, alt: p.caption || "Photo from the farm", loading: "lazy" }));
+      if (p.caption) btn.append(Object.assign(document.createElement("span"), { textContent: p.caption }));
+      btn.addEventListener("click", () => {
+        $("photo-view-img").src = p.src;
+        $("photo-view-img").alt = p.caption || "Photo from the farm";
+        $("photo-view-cap").textContent = p.caption;
+        $("photo-view").showModal();
+      });
+      li.append(btn);
+      return li;
+    }));
+  }
+  $("photo-view").addEventListener("click", (e) => { if (e.target === $("photo-view")) $("photo-view").close(); });
 
   // ---------- Password gate ----------
   function showGate(error) {

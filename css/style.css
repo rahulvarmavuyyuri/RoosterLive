@@ -205,3 +205,22 @@ html[data-bg]:not([data-bg="none"]) .day { background: color-mix(in srgb, var(--
 .cmp .btn { text-align: center; text-decoration: none; font-size: 0.9rem; padding: 9px 10px; }
 .compare-note { margin: 0; padding: 0 12px 12px; font-size: 0.8rem; color: var(--muted); }
 .compare-note:empty { display: none; }
+
+/* ---------- Shared photos ---------- */
+.ops > .share { grid-column: 1 / -1; }
+.shared-list { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 10px; }
+.shared-list li { display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.shared-list img { width: 72px; height: 72px; object-fit: cover; border-radius: 6px; border: 2px solid var(--ink); }
+.shared-list span { overflow-wrap: anywhere; font-size: 0.9rem; }
+label.btn { display: inline-block; }
+#share-file:focus-visible + * , label.btn:focus-within { outline: 3px solid var(--comb); outline-offset: 3px; }
+
+.photo-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+.photo-grid button { display: grid; gap: 6px; width: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: zoom-in; }
+.photo-grid img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border: 3px solid var(--ink); border-radius: 10px; background: var(--panel); }
+.photo-grid span { font-size: 0.9rem; font-weight: 700; }
+dialog.photo-view { max-width: min(96vw, 1000px); padding: 10px; border: 3px solid var(--ink); border-radius: 12px; background: var(--panel); color: var(--ink); }
+dialog.photo-view::backdrop { background: rgb(0 0 0 / 0.75); }
+dialog.photo-view img { max-height: 75vh; margin: 8px auto; border-radius: 8px; }
+dialog.photo-view p { margin: 0; text-align: center; font-weight: 700; }
+dialog.photo-view form { text-align: right; }

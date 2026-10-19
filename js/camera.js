@@ -40,6 +40,8 @@
     $("status-badge").classList.toggle("live", live);
     startBtn.disabled = live;
     stopBtn.disabled = !live;
+    const snap = document.getElementById("share-snap");
+    if (snap) snap.disabled = !live;
     slotSel.disabled = live;
   }
 
@@ -128,6 +130,7 @@
         return;
       }
       viewers.set(conn.peer, { conn, call: null });
+      if (shared.length) conn.send({ type: "photos", photos: shared });
       updateCount();
     });
     conn.on("data", (msg) => {
@@ -236,9 +239,81 @@
     micBtn.disabled = true;
     deviceSel.disabled = true;
     passInput.disabled = false;
+    shared.length = 0;
+    renderShared();
     setLive(false);
     if (keepStatus !== true) status("Camera stopped.");
   }
+
+  // ---------- Share a photo ----------
+  const MAX_SHARED = 12;
+  const shared = []; // { id, src, caption, ts }
+
+  function sendPhotos() {
+    for (const v of viewers.values()) if (v.conn.open) v.conn.send({ type: "photos", photos: shared });
+    renderShared();
+  }
+
+  function shareStatus(text, kind) {
+    const el = $("share-status");
+    el.textContent = text;
+    el.className = "status-line" + (kind ? " " + kind : "");
+    el.hidden = !text;
+  }
+
+  // Draw an image or video frame onto a canvas, at most 1000px on the long side.
+  function toJpeg(source, w, h) {
+    const scale = Math.min(1, 1000 / Math.max(w, h));
+    const c = document.createElement("canvas");
+    c.width = Math.round(w * scale);
+    c.height = Math.round(h * scale);
+    c.getContext("2d").drawImage(source, 0, 0, c.width, c.height);
+    return c.toDataURL("image/jpeg", 0.8);
+  }
+
+  function addShared(src) {
+    const caption = $("share-caption").value.replace(/\s+/g, " ").trim().slice(0, 80);
+    shared.unshift({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), src, caption, ts: Date.now() });
+    shared.length = Math.min(shared.length, MAX_SHARED);
+    $("share-caption").value = "";
+    sendPhotos();
+    shareStatus(peer ? "Shared with viewers." : "Saved. It goes to viewers when this camera is live.", "ok");
+  }
+
+  function renderShared() {
+    $("share-count").textContent = shared.length ? `${shared.length} shared` : "";
+    $("share-list").replaceChildren(...shared.map((p) => {
+      const li = document.createElement("li");
+      const img = Object.assign(document.createElement("img"), { src: p.src, alt: p.caption || "Shared photo" });
+      const cap = Object.assign(document.createElement("span"), { textContent: p.caption || "No caption" });
+      const del = Object.assign(document.createElement("button"), { type: "button", className: "btn small", textContent: "Remove" });
+      del.addEventListener("click", () => {
+        const i = shared.findIndex((x) => x.id === p.id);
+        if (i >= 0) shared.splice(i, 1);
+        sendPhotos();
+        shareStatus("Removed.", "ok");
+      });
+      li.append(img, cap, del);
+      return li;
+    }));
+  }
+
+  $("share-snap").addEventListener("click", () => {
+    if (!preview.videoWidth) { shareStatus("Start the camera first.", "err"); return; }
+    addShared(toJpeg(preview, preview.videoWidth, preview.videoHeight));
+  });
+
+  $("share-file").addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { shareStatus("That file isn't a photo.", "err"); return; }
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => { addShared(toJpeg(img, img.naturalWidth, img.naturalHeight)); URL.revokeObjectURL(url); };
+    img.onerror = () => { shareStatus("Couldn't open that photo. Try a JPG or PNG.", "err"); URL.revokeObjectURL(url); };
+    img.src = url;
+  });
 
   startBtn.addEventListener("click", start);
   stopBtn.addEventListener("click", () => stop());
