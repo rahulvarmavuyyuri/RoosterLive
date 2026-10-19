@@ -91,7 +91,7 @@ input[type="text"], select { width: 100%; min-width: 0; font: inherit; color: va
 
 /* Spotlight */
 .spot { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 14px; padding: 14px; align-items: start; }
-.spot img { width: 96px; height: 96px; object-fit: cover; border: 3px solid var(--ink); border-radius: 50% 50% 6px 6px; background: var(--bg); }
+.spot img { width: 96px; height: 96px; object-fit: cover; object-position: center 25%; border: 3px solid var(--ink); border-radius: 50% 50% 6px 6px; background: var(--bg); }
 .spot h3 { margin: 0; font-size: 1.35rem; line-height: 1.2; }
 .spot .breed { margin: 0 0 4px; color: var(--comb); font-weight: 700; }
 .spot p { margin: 0; font-size: 0.875rem; }
@@ -114,7 +114,7 @@ input[type="text"], select { width: 100%; min-width: 0; font: inherit; color: va
 .section .lede { margin: 0 0 26px; max-width: 62ch; color: var(--muted); }
 
 .flock { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 26px; list-style: none; margin: 0; padding: 0; }
-.bird img { width: 100%; aspect-ratio: 1; object-fit: cover; border: 4px solid var(--ink); border-radius: 50% 50% 6px 6px; background: var(--panel); }
+.bird img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: center 35%; border: 4px solid var(--ink); border-radius: 50% 50% 6px 6px; background: var(--panel); }
 .bird h3 { margin: 12px 0 0; font-size: 1.5rem; line-height: 1.2; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .oncam { font: 700 0.75rem/1 var(--body); background: #b8232b; color: #fff; padding: 4px 8px; border-radius: 4px; }
 .bird .breed { margin: 0 0 6px; color: var(--comb); font-weight: 700; }

@@ -37,13 +37,13 @@
       return el("li", { className: "bird" },
         el("img", { src: b.photo, alt: `${b.name}, ${b.breed}`, loading: "lazy" }),
         el("h3", {}, el("span", { textContent: b.name }), tag),
-        el("p", { className: "breed", textContent: b.breed }),
+        b.breed ? el("p", { className: "breed", textContent: b.breed }) : null,
         b.about ? el("p", { textContent: b.about }) : null,
         el("dl", {}, ...details.flatMap(([k, v]) => [el("dt", { textContent: k }), el("dd", { textContent: v })])),
-        el("span", {
+        typeof b.available === "boolean" ? el("span", {
           className: "status " + (b.available ? "avail" : "keep"),
           textContent: b.available ? "Available for breeding" : "Farm's own, not available",
-        })
+        }) : null
       );
     }));
   }

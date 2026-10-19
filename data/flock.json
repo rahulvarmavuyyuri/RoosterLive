@@ -1,62 +1,30 @@
 [
   {
-    "id": "sultan",
-    "name": "Sultan",
-    "breed": "Aseel",
-    "age": "3 years",
-    "weight": "4.2 kg",
-    "comb": "Pea comb",
-    "bloodline": "Sire: Raja II, Dam: Meena",
-    "about": "Copper hackles and a deep green tail. Upright, broad-chested and calm with handlers.",
-    "available": true,
-    "photo": "images/flock/sultan.svg"
+    "id": "rooster-1",
+    "name": "Rooster 1",
+    "breed": "Breed to be added",
+    "about": "Deep mahogany-red feathers with darker wings, a small pea comb and a tall, upright stance.",
+    "photo": "images/flock/rooster-1.jpg"
   },
   {
-    "id": "chintu",
-    "name": "Chintu",
-    "breed": "White Leghorn",
-    "age": "2 years",
-    "weight": "2.6 kg",
-    "comb": "Single comb",
-    "bloodline": "Hatchery line",
-    "about": "Pure white with a big floppy comb. The loudest morning crow on the farm.",
-    "available": false,
-    "photo": "images/flock/chintu.svg"
+    "id": "rooster-2",
+    "name": "Rooster 2",
+    "breed": "Breed to be added",
+    "about": "Golden hackles finely streaked with brown, and a bright red face.",
+    "photo": "images/flock/rooster-2.jpg"
   },
   {
-    "id": "kalu",
-    "name": "Kalu",
-    "breed": "Kadaknath",
-    "age": "2 years",
-    "weight": "2.1 kg",
-    "comb": "Single comb",
-    "bloodline": "Sire: Shyam, Dam: Rani",
-    "about": "Black from beak to toes, with a purple-green sheen in the sun.",
-    "available": true,
-    "photo": "images/flock/kalu.svg"
+    "id": "rooster-3",
+    "name": "Rooster 3",
+    "breed": "Breed to be added",
+    "about": "Straw-gold hackles over black-and-white laced body feathers, here showing off a full wing stretch.",
+    "photo": "images/flock/rooster-3.jpg"
   },
   {
-    "id": "bhola",
-    "name": "Bhola",
-    "breed": "Brahma",
-    "age": "1 year",
-    "weight": "4.8 kg",
-    "comb": "Pea comb",
-    "bloodline": "Sire: Gajraj, Dam: Lakshmi",
-    "about": "Gentle giant with feathered feet and silver-laced hackles.",
-    "available": true,
-    "photo": "images/flock/bhola.svg"
-  },
-  {
-    "id": "raja",
-    "name": "Raja",
-    "breed": "Rhode Island Red",
-    "age": "4 years",
-    "weight": "3.6 kg",
-    "comb": "Rose comb",
-    "bloodline": "Sire: Tipu, Dam: Gauri",
-    "about": "Deep mahogany red. The senior bird who keeps the young ones in line.",
-    "available": false,
-    "photo": "images/flock/raja.svg"
+    "id": "rooster-4",
+    "name": "Rooster 4",
+    "breed": "Breed to be added",
+    "about": "Glossy black body with a long straw-gold hackle and pale legs.",
+    "photo": "images/flock/rooster-4.jpg"
   }
 ]
