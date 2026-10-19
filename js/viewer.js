@@ -259,7 +259,7 @@
   }
   function renderPhotos() {
     const all = Object.values(photosByCam).flat().sort((a, b) => b.ts - a.ts);
-    $("photos-section").hidden = all.length === 0;
+    $("photos-empty").hidden = all.length > 0;
     $("photo-grid").replaceChildren(...all.map((p) => {
       const li = document.createElement("li");
       const btn = Object.assign(document.createElement("button"), { type: "button" });

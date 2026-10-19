@@ -55,19 +55,13 @@
       </div>
 
       <div class="side">
-        <section class="panel" aria-labelledby="spot-title">
-          <header><h2 id="spot-title">On camera now</h2></header>
-          <div class="spot" id="spot" hidden></div>
-          <p class="spot-empty" id="spot-empty">When the host puts a bird in front of the camera, you'll see who it is here.</p>
-        </section>
-
-        <section class="panel compare" aria-labelledby="compare-title">
+        <section class="panel photos-panel" aria-labelledby="photos-title" id="photos-section">
           <header>
-            <h2 id="compare-title">Compare birds</h2>
-            <span class="meta">Pick any two</span>
+            <h2 id="photos-title">Photos from the farm</h2>
+            <span class="meta">Tap to enlarge</span>
           </header>
-          <div class="compare-grid" id="compare"></div>
-          <p class="compare-note" id="compare-note"></p>
+          <ul class="photo-grid side-photos" id="photo-grid"></ul>
+          <p class="spot-empty" id="photos-empty">Photos shared from the farm cameras will appear here.</p>
         </section>
 
         <section class="panel chat" aria-labelledby="chat-title" hidden>
@@ -90,11 +84,23 @@
       </div>
     </div>
 
-    <section class="section" aria-labelledby="photos-title" id="photos-section" hidden>
-      <div class="wrap">
-        <h2 id="photos-title">Photos from the farm</h2>
-        <p class="lede">Shared live from the farm cameras. Tap a photo to see it bigger.</p>
-        <ul class="photo-grid" id="photo-grid"></ul>
+    <section class="section" aria-label="On camera now and compare birds">
+      <div class="wrap duo">
+          <section class="panel" aria-labelledby="spot-title">
+          <header><h2 id="spot-title">On camera now</h2></header>
+          <div class="spot" id="spot" hidden></div>
+          <p class="spot-empty" id="spot-empty">When the host puts a bird in front of the camera, you'll see who it is here.</p>
+        </section>
+
+        <section class="panel compare" aria-labelledby="compare-title">
+          <header>
+            <h2 id="compare-title">Compare birds</h2>
+            <span class="meta">Pick any two</span>
+          </header>
+          <div class="compare-grid" id="compare"></div>
+          <p class="compare-note" id="compare-note"></p>
+        </section>
+
       </div>
     </section>
 

@@ -266,3 +266,10 @@ dialog.photo-view form { text-align: right; }
 .main-phone { margin-top: 16px; padding-top: 12px; border-top: 2px solid var(--edge); }
 .main-phone .status-line { margin-bottom: 4px; }
 @media (max-width: 420px) { .tabs [role="tab"] { font-size: 0.85rem; padding: 9px 4px; } }
+
+/* ---------- Viewer layout: photos beside the video, spotlight + compare below ---------- */
+.photos-panel .side-photos { grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px; max-height: 520px; overflow-y: auto; }
+.photos-panel .side-photos img { aspect-ratio: 1; }
+.photos-panel .side-photos span { font-size: 0.8rem; }
+.duo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 20px; align-items: start; }
+@media (max-width: 900px) { .duo { grid-template-columns: 1fr; } }

@@ -38,13 +38,13 @@
       const price = fmtPrice(b.price);
       const rows = [["Plumage", b.breed], ["Age", b.age], ["Weight", b.weight], ["Comb", b.comb], ["Bloodline", b.bloodline]]
         .filter(([, v]) => v);
-      body.replaceChildren(
+      body.replaceChildren(...[
         el("img", { src: b.photo, alt: `${b.name}, ${b.breed || "rooster"}` }),
         el("h3", {}, b.name, b.nameTe ? el("span", { className: "name-te", lang: "te", textContent: " " + b.nameTe }) : null),
         el("div", { className: "price" + (price ? "" : " ask"), textContent: price || "Price on request" }),
         rows.length ? el("dl", {}, ...rows.flatMap(([k, v]) => [el("dt", { textContent: k }), el("dd", { textContent: v })])) : null,
         b.available === false ? el("span", { className: "status keep", textContent: "Not for sale" }) : buyLink(b),
-      );
+      ].filter(Boolean));
     }
     sel.addEventListener("change", render);
     render();
