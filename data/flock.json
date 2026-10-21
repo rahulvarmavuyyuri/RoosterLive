@@ -15,7 +15,8 @@
     "about": "Golden hackles finely streaked with brown like a hawk's feathers, and a bright red face.",
     "photo": "images/flock/rooster-2.jpg",
     "nameTe": "డేగ",
-    "price": null
+    "price": null,
+    "available": true
   },
   {
     "id": "rooster-3",
