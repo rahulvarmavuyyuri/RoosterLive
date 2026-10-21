@@ -292,7 +292,7 @@
 
   // ---------- Password gate ----------
   // Only the live area (video, farm photos, chat) is locked. The flock,
-  // compare and schedule sections are open to everyone. The video stays
+  // and compare sections are open to everyone. The video stays
   // covered until a live camera or the host confirms the password.
   function gateNote(text) {
     $("gate-note").textContent = text || "";
