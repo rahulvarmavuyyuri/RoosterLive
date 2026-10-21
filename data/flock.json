@@ -44,5 +44,15 @@
     "price": null,
     "available": true,
     "photo": "images/flock/pacha-kaki-mvi5qx2d.jpg"
+  },
+  {
+    "id": "nemali",
+    "name": "Nemali",
+    "nameTe": "పింగళ",
+    "breed": "Red-brown plumage",
+    "about": "Bright, mixed colours like a peacock.",
+    "price": null,
+    "available": true,
+    "photo": "images/flock/nemali-mvi5trry.jpg"
   }
 ]
