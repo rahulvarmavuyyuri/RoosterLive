@@ -22,7 +22,7 @@
   }
 
   // ---------- GitHub API ----------
-  const api = (path) => `https://api.github.com/repos/${gh.owner}/${gh.repo}/${path}`;
+  const api = (path) => `https://api.github.com/repos/${gh.owner}/${gh.repo}${path ? "/" + path : ""}`;
 
   async function call(path, opts = {}) {
     if (!token) throw new Error("Save your GitHub key first.");
@@ -72,7 +72,7 @@
   }
 
   $("m-token-save").addEventListener("click", async () => {
-    const v = $("m-token").value.trim();
+    const v = $("m-token").value.replace(/[^\x21-\x7E]/g, "");
     if (!v || v.startsWith("•")) { say("m-key-status", "Paste your GitHub key first.", "err"); return; }
     token = v;
     say("m-key-status", "Checking the key…");
