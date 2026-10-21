@@ -1,6 +1,7 @@
 // Simple tabs for the camera page. Remembers the last tab on this phone.
 (function () {
-  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  // Tabs marked hidden in the page are switched off and skipped.
+  const tabs = [...document.querySelectorAll('[role="tab"]')].filter((t) => !t.hidden);
   if (!tabs.length) return;
   function show(tab, focus) {
     for (const t of tabs) {

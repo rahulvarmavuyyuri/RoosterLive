@@ -281,3 +281,6 @@ dialog.photo-view form { text-align: right; }
 .step.done::before { content: "✓"; background: var(--pasture); color: #fff; }
 .step h3 { margin: 2px 0 10px; font-family: var(--display); font-size: 1.15rem; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
 .lock-note { margin: 8px 0 0; font-weight: 700; color: var(--comb); }
+
+/* Two visible tabs while "On camera" is switched off */
+.tabs:has([role="tab"][hidden]) { grid-template-columns: repeat(2, 1fr); }
