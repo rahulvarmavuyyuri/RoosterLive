@@ -34,5 +34,15 @@
     "photo": "images/flock/rooster-4.jpg",
     "nameTe": "కాకి డేగ",
     "price": null
+  },
+  {
+    "id": "pacha-kaki",
+    "name": "Pacha Kaki",
+    "nameTe": "పచ్చ కాకి",
+    "breed": "Black with a green sheen",
+    "about": "Black feathers that shine green in the sun.",
+    "price": null,
+    "available": true,
+    "photo": "images/flock/pacha-kaki-mvi5qx2d.jpg"
   }
 ]
