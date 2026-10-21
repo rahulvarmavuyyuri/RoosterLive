@@ -199,11 +199,17 @@
     return "Nemali";
   }
 
+  // Replace a field when it's empty or still holds text from another variety;
+  // keep it when you've typed your own.
+  function isVarietyText(value, field) {
+    const t = value.trim();
+    return !t || VARIETIES.some((x) => x[field] === t);
+  }
   function applyVariety(v, chip) {
-    if (!$("m-name").value.trim()) $("m-name").value = v.en;
+    if (isVarietyText($("m-name").value, "en")) $("m-name").value = v.en;
     $("m-te").value = v.te;
     $("m-breed").value = v.plumage;
-    if (!$("m-about").value.trim()) $("m-about").value = v.about;
+    if (isVarietyText($("m-about").value, "about")) $("m-about").value = v.about;
     [...$("m-varieties").children].forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
   }
 
