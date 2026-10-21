@@ -42,7 +42,7 @@
         el("dl", {}, ...details.flatMap(([k, v]) => [el("dt", { textContent: k }), el("dd", { textContent: v })])),
         typeof b.available === "boolean" ? el("span", {
           className: "status " + (b.available ? "avail" : "keep"),
-          textContent: b.available ? "Available for breeding" : "Farm's own, not available",
+          textContent: b.available ? "For sale" : "Not for sale",
         }) : null
       );
     }));
