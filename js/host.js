@@ -110,6 +110,7 @@
         return;
       }
       viewers.set(conn.peer, { conn, lastMsg: 0 });
+      conn.send({ type: "ok" });
       conn.send({ type: "history", messages: state.history });
       conn.send(spotlightMessage());
       updateCount();

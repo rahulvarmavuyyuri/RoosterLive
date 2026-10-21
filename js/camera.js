@@ -142,6 +142,7 @@
         return;
       }
       viewers.set(conn.peer, { conn, call: null });
+      conn.send({ type: "ok" });
       if (shared.length) conn.send({ type: "photos", photos: shared });
       updateCount();
     });

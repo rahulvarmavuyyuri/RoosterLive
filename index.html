@@ -12,13 +12,14 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="gate" id="gate" hidden>
+  <div class="gate" id="gate">
     <form class="gate-card" id="gate-form" autocomplete="off">
       <h2>Friends only</h2>
       <p>Enter the password the farm shared with you to watch the roosters live.</p>
       <label class="visually-hidden" for="gate-pass">Password</label>
       <input type="password" id="gate-pass" placeholder="Password" required minlength="4" autocomplete="current-password">
       <p class="gate-error" id="gate-error" role="alert" hidden></p>
+      <p class="gate-note" id="gate-note" role="status" hidden></p>
       <button class="btn primary" type="submit">Watch live</button>
     </form>
   </div>

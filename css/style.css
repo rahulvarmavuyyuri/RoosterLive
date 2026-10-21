@@ -181,7 +181,11 @@ html[data-bg]:not([data-bg="none"]) .bird { background: color-mix(in srgb, var(-
 html[data-bg]:not([data-bg="none"]) .day { background: color-mix(in srgb, var(--panel) 88%, transparent); padding: 0 14px; border-radius: 0 0 8px 8px; }
 
 /* ---------- Password gate (viewer page) ---------- */
-.gate { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; background: color-mix(in srgb, var(--bg) 82%, transparent); }
+.gate { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; background: var(--bg); overflow-y: auto; }
+/* Nothing on the viewer page shows until the farm accepts the password. */
+html:not(.unlocked) body:has(#gate) > :not(#gate):not(script) { visibility: hidden; }
+.gate-note { color: var(--muted); font-weight: 700; }
+.gate-form.checking input, .gate-card.checking input { opacity: 0.6; }
 .gate-card { width: min(420px, 100%); background: var(--panel); border: 2px solid var(--ink); border-radius: 12px; padding: 24px; display: grid; gap: 12px; box-shadow: 0 12px 40px rgb(0 0 0 / .2); }
 .gate-card h2 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 2rem; line-height: 1.1; color: var(--comb); }
 .gate-card p { margin: 0; }
