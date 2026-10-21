@@ -45,13 +45,5 @@
     "price": null,
     "available": true,
     "photo": "images/flock/nemali-mvi5trry.jpg"
-  },
-  {
-    "id": "seetuva",
-    "name": "Seetuva",
-    "nameTe": "సేతువ",
-    "price": null,
-    "available": true,
-    "photo": "images/flock/seetuva-mvieqec4.jpg"
   }
 ]
