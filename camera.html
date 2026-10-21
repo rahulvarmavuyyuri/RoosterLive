@@ -37,13 +37,31 @@
     <nav class="tabs" role="tablist" aria-label="Camera page sections">
       <button role="tab" type="button" id="tab-live" aria-controls="pane-live" aria-selected="true">Go live</button>
       <button role="tab" type="button" id="tab-spot" aria-controls="pane-spot" aria-selected="false">On camera</button>
-      <button role="tab" type="button" id="tab-photos" aria-controls="pane-photos" aria-selected="false">Photos</button>
       <button role="tab" type="button" id="tab-birds" aria-controls="pane-birds" aria-selected="false">My birds</button>
     </nav>
 
     <section class="pane" role="tabpanel" id="pane-live" aria-labelledby="tab-live">
 
           <p class="status-line" id="status-line">Ready when you are.</p>
+          <ol class="steps">
+            <li class="step" id="step-photos">
+              <h3>Add photos <span class="meta" id="share-count"></span></h3>
+        <div class="field">
+          <label for="share-caption">Caption (optional)</label>
+          <input type="text" id="share-caption" maxlength="80" autocomplete="off" placeholder="e.g. Pingala after his morning bath">
+        </div>
+        <div class="row">
+          <button class="btn primary" id="share-snap" type="button" disabled>Snap from camera</button>
+          <label class="btn" for="share-file" id="share-pick">Choose photo</label>
+          <input type="file" id="share-file" accept="image/*" class="visually-hidden">
+        </div>
+        <p class="hint">Choose a photo now. Once you're live you can also snap one from the camera. Friends see them under "Photos from the farm".</p>
+        <p class="status-line" id="share-status" hidden></p>
+        <ul class="shared-list" id="share-list"></ul>
+            </li>
+            <li class="step">
+              <h3>Set up and go live</h3>
+
           <div class="field">
             <label for="pass">Viewer password</label>
             <input type="text" id="pass" minlength="4" maxlength="64" autocomplete="off" placeholder="At least 4 characters">
@@ -71,7 +89,10 @@
             <button class="btn" id="stop" type="button" disabled>Stop</button>
             <button class="btn" id="mic" type="button" disabled>Mute sound</button>
           </div>
+          <p class="lock-note" id="live-lock">Add at least one photo in step 1 to unlock Go live.</p>
           <p class="hint">Keep this page open with the screen on, and plug the phone into power.</p>
+            </li>
+          </ol>
         <div class="main-phone">
           <p class="status-line" id="h-status">Not live.</p>
           <p class="hint">The first phone that goes live is the <b>main phone</b>: it also runs the "On camera" spotlight. Other phones just stream. <span id="viewer-count"></span></p>
@@ -92,22 +113,6 @@
           </div>
     </section>
 
-    <section class="pane" role="tabpanel" id="pane-photos" aria-labelledby="tab-photos" hidden>
-      <h2>Share a photo <span class="meta" id="share-count"></span></h2>
-
-        <div class="field">
-          <label for="share-caption">Caption (optional)</label>
-          <input type="text" id="share-caption" maxlength="80" autocomplete="off" placeholder="e.g. Pingala after his morning bath">
-        </div>
-        <div class="row">
-          <button class="btn primary" id="share-snap" type="button" disabled>Snap from camera</button>
-          <label class="btn" for="share-file" id="share-pick">Choose photo</label>
-          <input type="file" id="share-file" accept="image/*" class="visually-hidden">
-        </div>
-        <p class="hint">Photos go to friends watching right now, and to anyone who joins while this camera is live. They disappear when you stop the camera.</p>
-        <p class="status-line" id="share-status" hidden></p>
-        <ul class="shared-list" id="share-list"></ul>
-    </section>
 
     <section class="pane manage-body" role="tabpanel" id="pane-birds" aria-labelledby="tab-birds" hidden>
       <h2>My birds <span class="meta" id="m-count"></span></h2>

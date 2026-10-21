@@ -35,10 +35,22 @@
     $("status-line").className = "status-line" + (kind ? " " + kind : "");
   }
 
+  // Going live needs at least one photo for viewers.
+  let isLive = false;
+  function updateStartLock() {
+    const n = typeof shared === "undefined" ? 0 : shared.length;
+    startBtn.disabled = isLive || n === 0;
+    const lock = document.getElementById("live-lock");
+    if (lock) lock.hidden = isLive || n > 0;
+    const step = document.getElementById("step-photos");
+    if (step) step.classList.toggle("done", n > 0);
+  }
+
   function setLive(live) {
     $("status-badge").textContent = live ? "Live" : "Not live";
     $("status-badge").classList.toggle("live", live);
-    startBtn.disabled = live;
+    isLive = live;
+    updateStartLock();
     stopBtn.disabled = !live;
     const snap = document.getElementById("share-snap");
     if (snap) snap.disabled = !live;
@@ -173,6 +185,11 @@
       status("This browser can't use the camera. Open the page over https in Chrome, Safari or Firefox.", "err");
       return;
     }
+    if (!shared.length) {
+      status("Add at least one photo first (step 1), then go live.", "err");
+      document.getElementById("step-photos")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
     const pass = passInput.value.trim();
     if (pass.length < 4) {
       status("Set a viewer password of at least 4 characters first.", "err");
@@ -240,8 +257,6 @@
     micBtn.disabled = true;
     deviceSel.disabled = true;
     passInput.disabled = false;
-    shared.length = 0;
-    renderShared();
     window.dispatchEvent(new Event("farmcam:stopped"));
     setLive(false);
     if (keepStatus !== true) status("Camera stopped.");
@@ -279,10 +294,11 @@
     shared.length = Math.min(shared.length, MAX_SHARED);
     $("share-caption").value = "";
     sendPhotos();
-    shareStatus(peer ? "Shared with viewers." : "Saved. It goes to viewers when this camera is live.", "ok");
+    shareStatus(peer ? "Shared with viewers." : "Photo added. You can go live now.", "ok");
   }
 
   function renderShared() {
+    updateStartLock();
     $("share-count").textContent = shared.length ? `${shared.length} shared` : "";
     $("share-list").replaceChildren(...shared.map((p) => {
       const li = document.createElement("li");
