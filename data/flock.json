@@ -34,17 +34,5 @@
     "photo": "images/flock/rooster-4.jpg",
     "nameTe": "కాకి డేగ",
     "price": null
-  },
-  {
-    "id": "kaki-dega",
-    "name": "Kaki Dega",
-    "nameTe": "కాకి డేగ",
-    "breed": "Black body, golden neck",
-    "age": "1 year",
-    "weight": "4",
-    "about": "Crow-black body with golden neck feathers.",
-    "price": 15000,
-    "available": true,
-    "photo": "images/flock/kaki-dega-mvi507h5.jpg"
   }
 ]
