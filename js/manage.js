@@ -146,6 +146,18 @@
     { en: "Nemali", te: "నెమలి", plumage: "Showy peacock-like plumage", about: "Bright, mixed colours like a peacock." },
     { en: "Tella Nemali", te: "తెల్ల నెమలి", plumage: "White peacock-like plumage", about: "Mostly white with showy markings." },
     { en: "Pingala", te: "పింగళ", plumage: "Red-brown plumage", about: "Deep red-brown, tawny feathers." },
+    // Colour clear from the Telugu words
+    { en: "Nalla Kaki", te: "నల్ల కాకి", plumage: "Jet-black plumage", about: "Deep, glossy black all over." },
+    { en: "Erra Kaki Dega", te: "ఎర్ర కాకి డేగ", plumage: "Black body, red-gold neck", about: "Dark body with reddish hawk-like hackles." },
+    { en: "Kaki Nemali", te: "కాకి నెమలి", plumage: "Black with a showy sheen", about: "Black feathers with bright, peacock-like shine." },
+    { en: "Nemali Pingala", te: "నెమలి పింగళ", plumage: "Red-brown with showy markings", about: "Red-brown feathers with bright, mixed markings." },
+    // Names used in Andhra; colour not filled in, add your own
+    { en: "Parla", te: "పర్ల", plumage: "", about: "" },
+    { en: "Abras", te: "అబ్రాస్", plumage: "", about: "" },
+    { en: "Maila", te: "మైల", plumage: "", about: "" },
+    { en: "Seetuva", te: "సేతువ", plumage: "", about: "" },
+    { en: "Kokkirai", te: "కొక్కిరాయి", plumage: "", about: "" },
+    { en: "Rasangi", te: "రసంగి", plumage: "", about: "" },
   ];
 
   // ---------- Colour guess from the photo ----------
@@ -208,7 +220,8 @@
   function applyVariety(v, chip) {
     if (isVarietyText($("m-name").value, "en")) $("m-name").value = v.en;
     $("m-te").value = v.te;
-    $("m-breed").value = v.plumage;
+    // Names without a known colour leave plumage and About for you to fill in.
+    if (v.plumage || isVarietyText($("m-breed").value, "plumage")) $("m-breed").value = v.plumage;
     if (isVarietyText($("m-about").value, "about")) $("m-about").value = v.about;
     [...$("m-varieties").children].forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
   }
@@ -220,7 +233,9 @@
       b.dataset.variety = v.en;
       b.addEventListener("click", () => {
         applyVariety(v, b);
-        say("m-status-line", `Filled in ${v.en} (${v.te}). Check the details, then save.`, "ok");
+        say("m-status-line", v.plumage
+          ? `Filled in ${v.en} (${v.te}). Check the details, then save.`
+          : `Filled in the name ${v.en} (${v.te}). Add the plumage and About yourself, then save.`, "ok");
       });
       b.setAttribute("aria-pressed", "false");
       return b;
