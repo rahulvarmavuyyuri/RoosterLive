@@ -118,6 +118,17 @@
       uploadedPath = null;
       $("m-photo-preview").src = dataUrl;
       $("m-photo-preview").hidden = false;
+      if (!$("m-id").value) {
+        const guess = guessVariety(img);
+        const v = guess && VARIETIES.find((x) => x.en === guess);
+        const chip = v && [...$("m-varieties").children].find((c) => c.dataset.variety === v.en);
+        if (v && chip) {
+          applyVariety(v, chip);
+          say("m-status-line", `From the photo's colours this looks like ${v.en} (${v.te}). It's only a guess: tap a different variety below if it's wrong.`, "ok");
+        } else {
+          say("m-status-line", "Couldn't tell the variety from this photo's colours. Tap the variety below.", "");
+        }
+      }
       URL.revokeObjectURL(url);
     };
     img.onerror = () => { say("m-status-line", "Couldn't open that photo. Try a JPG or PNG.", "err"); URL.revokeObjectURL(url); };
@@ -137,16 +148,72 @@
     { en: "Pingala", te: "పింగళ", plumage: "Red-brown plumage", about: "Deep red-brown, tawny feathers." },
   ];
 
+  // ---------- Colour guess from the photo ----------
+  // Looks at the bird's main colours (ignoring colours that also fill the photo's
+  // edges, which are usually background) and suggests the closest variety.
+  function guessVariety(img) {
+    const scale = Math.min(1, 160 / Math.max(img.naturalWidth, img.naturalHeight));
+    const W = Math.max(1, Math.round(img.naturalWidth * scale));
+    const H = Math.max(1, Math.round(img.naturalHeight * scale));
+    const c = document.createElement("canvas");
+    c.width = W; c.height = H;
+    const ctx = c.getContext("2d");
+    ctx.drawImage(img, 0, 0, W, H);
+    let px;
+    try { px = ctx.getImageData(0, 0, W, H).data; } catch { return null; }
+    const Q = 24, at = (x, y) => (y * W + x) * 4;
+    const key = (i) => `${Math.floor(px[i] / Q)},${Math.floor(px[i + 1] / Q)},${Math.floor(px[i + 2] / Q)}`;
+    const border = new Map(); let total = 0;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      if (x < W * 0.12 || x > W * 0.88 || y < H * 0.1 || y > H * 0.9) {
+        const k = key(at(x, y)); border.set(k, (border.get(k) || 0) + 1); total++;
+      }
+    }
+    const bg = new Set([...border].filter(([, v]) => v / total > 0.004).map(([k]) => k));
+    const n = { black: 0, white: 0, red: 0, gold: 0, grey: 0 }; let count = 0;
+    for (let y = Math.floor(H * 0.15); y < H * 0.85; y++) for (let x = Math.floor(W * 0.18); x < W * 0.82; x++) {
+      const i = at(x, y);
+      if (bg.has(key(i))) continue;
+      const r = px[i] / 255, g = px[i + 1] / 255, b = px[i + 2] / 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2, d = max - min;
+      const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+      let h = 0;
+      if (d) h = max === r ? 60 * (((g - b) / d) % 6) : max === g ? 60 * ((b - r) / d + 2) : 60 * ((r - g) / d + 4);
+      if (h < 0) h += 360;
+      if (s > 0.25 && h >= 70 && h <= 260) continue; // leaves, nets, sky
+      count++;
+      if (l < 0.18) n.black++;
+      else if (l > 0.68 && s < 0.45) n.white++;
+      else if (s < 0.18) n.grey++;
+      else if (h < 20 || h > 335 || (h < 45 && l < 0.4)) n.red++;
+      else if (h < 70) n.gold++;
+      else n.grey++;
+    }
+    if (count < 300) return null;
+    const p = (k) => (100 * n[k]) / count;
+    if (p("grey") >= 60) return null;                        // can't tell
+    if (p("white") >= 35) return "Tella Nemali";
+    if (p("black") >= 55) return p("gold") >= 10 ? "Kaki Dega" : "Kaki";
+    if (p("red") + p("gold") >= 70 && p("black") < 15) return "Dega";
+    if (p("black") >= 30 && p("red") >= 15) return "Pingala";
+    return "Nemali";
+  }
+
+  function applyVariety(v, chip) {
+    if (!$("m-name").value.trim()) $("m-name").value = v.en;
+    $("m-te").value = v.te;
+    $("m-breed").value = v.plumage;
+    if (!$("m-about").value.trim()) $("m-about").value = v.about;
+    [...$("m-varieties").children].forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
+  }
+
   function renderVarieties() {
     $("m-varieties").replaceChildren(...VARIETIES.map((v) => {
       const b = Object.assign(document.createElement("button"), { type: "button", className: "chip" });
       b.append(v.en, Object.assign(document.createElement("span"), { lang: "te", textContent: " " + v.te }));
+      b.dataset.variety = v.en;
       b.addEventListener("click", () => {
-        if (!$("m-name").value.trim()) $("m-name").value = v.en;
-        $("m-te").value = v.te;
-        $("m-breed").value = v.plumage;
-        if (!$("m-about").value.trim()) $("m-about").value = v.about;
-        [...$("m-varieties").children].forEach((c) => c.setAttribute("aria-pressed", String(c === b)));
+        applyVariety(v, b);
         say("m-status-line", `Filled in ${v.en} (${v.te}). Check the details, then save.`, "ok");
       });
       b.setAttribute("aria-pressed", "false");
