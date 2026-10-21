@@ -59,7 +59,7 @@
 
   // ---------- Spotlight ----------
   function setSpotlight(birdId) {
-    if (notMain) { status("Another phone is the main phone. Change who's on camera from that phone."); return; }
+    if (notMain) { status("Connected through another camera phone."); return; }
     const camera = $("spot-cam").value || null;
     state.spotlight = { bird: birdId, camera: birdId ? camera : null };
     save();
@@ -133,7 +133,7 @@
     peer = new Peer(ids.hub(), { config: { iceServers: cfg.iceServers } });
     peer.on("open", () => {
       notMain = false;
-      status(autoMode ? "This is the main phone. Use the On camera tab to show who's on camera." : "Online. Viewers can chat and see who's in the spotlight.", "ok");
+      status(autoMode ? "Connected. Friends can watch now." : "Online. Viewers can chat and see who's in the spotlight.", "ok");
       $("chat-text").disabled = false;
       $("chat-send").disabled = false;
       updateCount();
@@ -147,7 +147,7 @@
       if (err.type === "unavailable-id") {
         if (autoMode) {
           notMain = true;
-          status("Another phone is the main phone. Change who's on camera from that phone.");
+          status("Connected through another camera phone.");
           // If the main phone stops, this phone takes over.
           clearTimeout(claimTimer);
           claimTimer = setTimeout(() => { if (camLive && !peer) goOnline(); }, 15000);
