@@ -319,3 +319,6 @@ dialog.sheet::backdrop { background: rgb(0 0 0 / 0.6); }
 .sheet-head h2 { margin: 0; font-family: var(--display); font-size: 1.3rem; }
 .sheet-body { padding: 16px; }
 .sheet .row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Compare birds on its own (On camera now removed) */
+.duo.solo { grid-template-columns: minmax(0, 720px); justify-content: start; }
