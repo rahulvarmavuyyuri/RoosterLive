@@ -284,3 +284,13 @@ dialog.photo-view form { text-align: right; }
 
 /* Two visible tabs while "On camera" is switched off */
 .tabs:has([role="tab"][hidden]) { grid-template-columns: repeat(2, 1fr); }
+
+/* GitHub key folded into one line */
+details.manage-key { padding: 10px 12px; border: 2px solid var(--edge); border-radius: 8px; background: var(--bg); }
+details.manage-key > summary { cursor: pointer; font-weight: 700; list-style: none; display: flex; align-items: center; gap: 8px; }
+details.manage-key > summary::-webkit-details-marker { display: none; }
+details.manage-key > summary::after { content: "▸"; margin-left: auto; color: var(--muted); }
+details.manage-key[open] > summary::after { content: "▾"; }
+details.manage-key.ok > summary { color: var(--pasture); }
+details.manage-key[open] > summary { margin-bottom: 8px; }
+.manage-key { padding-bottom: 10px; border-bottom: 0; }

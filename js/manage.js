@@ -67,6 +67,8 @@
   function renderKey() {
     $("m-token").value = token ? "••••••••••••" : "";
     $("m-token-forget").hidden = !token;
+    $("m-key-summary").textContent = token ? "GitHub key: saved ✓" : "GitHub key: not set (tap to add)";
+    $("m-key-box").classList.toggle("ok", !!token);
   }
 
   $("m-token-save").addEventListener("click", async () => {
@@ -78,8 +80,9 @@
       const repo = await call("");
       if (!repo.permissions || !repo.permissions.push) throw new Error("The key can read RoosterLive but can't save. Set Contents to Read and write.");
       try { localStorage.setItem(KEY, token); } catch { /* ignore */ }
-      say("m-key-status", "Key saved. You can add birds now.", "ok");
+      say("m-key-status", "", "");
       renderKey();
+      $("m-key-box").open = false;
     } catch (err) {
       token = "";
       say("m-key-status", err.message, "err");
@@ -188,6 +191,12 @@
     e.preventDefault();
     const name = $("m-name").value.trim();
     if (!name) { say("m-status-line", "Give the bird a name.", "err"); return; }
+    if (!token) {
+      $("m-key-box").open = true;
+      say("m-key-status", "Add your GitHub key first, then tap Save bird again.", "err");
+      $("m-key-box").scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
     const editing = $("m-id").value;
     if (!editing && !photoData) { say("m-status-line", "Choose a photo for the new bird.", "err"); return; }
 
