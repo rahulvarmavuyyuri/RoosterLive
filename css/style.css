@@ -294,3 +294,24 @@ details.manage-key[open] > summary::after { content: "▾"; }
 details.manage-key.ok > summary { color: var(--pasture); }
 details.manage-key[open] > summary { margin-bottom: 8px; }
 .manage-key { padding-bottom: 10px; border-bottom: 0; }
+
+/* My birds (camera page): photo tiles + pop-up form */
+.m-tip { margin: -6px 0 0; }
+.tiles { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+.tiles > li { display: flex; }
+.tile { appearance: none; width: 100%; padding: 0; border: 2px solid var(--ink); border-radius: 12px; overflow: hidden; background: var(--bg); color: var(--ink); text-align: left; cursor: pointer; font: inherit; display: flex; flex-direction: column; }
+.tile img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+.tile > span { padding: 6px 8px 8px; font-weight: 700; line-height: 1.25; }
+.tile small { display: block; font-weight: 400; color: var(--muted); font-size: 0.78rem; }
+.tile small[lang="te"] { display: inline; font-family: "Noto Sans Telugu", var(--body); font-weight: 600; }
+.tile.add { justify-content: center; align-items: center; min-height: 180px; border-style: dashed; background: var(--panel); font: 700 1.05rem/1.2 var(--display); color: var(--comb); text-align: center; }
+.tile.add b { display: block; font-size: 2.6rem; line-height: 1; }
+.pill { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 0 7px; border-radius: 999px; border: 2px solid currentColor; margin-left: 6px; }
+.pill.sale { color: var(--pasture); }
+.pill.keep { color: var(--muted); }
+dialog.sheet { width: min(680px, 96vw); max-height: 92vh; padding: 0; border: 3px solid var(--ink); border-radius: 14px; background: var(--panel); color: var(--ink); }
+dialog.sheet::backdrop { background: rgb(0 0 0 / 0.6); }
+.sheet-head { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; background: var(--panel); border-bottom: 2px solid var(--edge); }
+.sheet-head h2 { margin: 0; font-family: var(--display); font-size: 1.3rem; }
+.sheet-body { padding: 16px; }
+.sheet .row { display: flex; flex-wrap: wrap; gap: 8px; }

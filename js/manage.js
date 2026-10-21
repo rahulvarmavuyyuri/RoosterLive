@@ -14,6 +14,10 @@
   let flock = [];
   let photoData = null; // base64 JPEG (no prefix) of a newly chosen photo
   let uploadedPath = null; // where photoData was already saved, if it was
+  // Camera page: birds as photo tiles, form in a pop-up. Host page: plain list.
+  const sheet = $("m-sheet");
+  let editingBird = null;
+  let keepDraft = false; // form was closed only to add the GitHub key
 
   function say(id, text, kind) {
     const el = $(id);
@@ -85,6 +89,11 @@
       say("m-key-status", "", "");
       renderKey();
       $("m-key-box").open = false;
+      if (sheet && keepDraft) { // back to the bird they were saving
+        keepDraft = false;
+        sheet.showModal();
+        say("m-status-line", "Key saved. Tap Save again.", "ok");
+      }
     } catch (err) {
       token = "";
       say("m-key-status", err.message, "err");
@@ -261,8 +270,21 @@
     $("m-photo-preview").hidden = true;
     $("m-form-title").textContent = "Add a bird";
     $("m-save").textContent = "Save bird";
-    $("m-cancel").hidden = true;
+    $("m-cancel").hidden = !sheet;
+    if ($("m-remove")) $("m-remove").hidden = true;
+    editingBird = null;
+    say("m-status-line", "");
   }
+
+  function openSheet(b) {
+    if (b) editBird(b);
+    else if (!keepDraft || editingBird) resetForm();
+    keepDraft = false;
+    say("m-done", "");
+    if (!sheet.open) sheet.showModal();
+    sheet.scrollTop = 0;
+  }
+  function closeSheet() { if (sheet && sheet.open) sheet.close(); }
 
   function editBird(b) {
     resetForm();
@@ -274,18 +296,27 @@
     $("m-form-title").textContent = `Edit ${b.name}`;
     $("m-save").textContent = "Save changes";
     $("m-cancel").hidden = false;
-    $("m-form").scrollIntoView({ behavior: "smooth", block: "start" });
+    editingBird = b;
+    if ($("m-remove")) $("m-remove").hidden = false;
+    if (!sheet) $("m-form").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  $("m-cancel").addEventListener("click", resetForm);
+  $("m-cancel").addEventListener("click", () => { resetForm(); closeSheet(); });
+  if (sheet) {
+    $("m-close").addEventListener("click", closeSheet);
+    $("m-remove").addEventListener("click", (e) => editingBird && removeBird(editingBird, e.currentTarget));
+  }
 
   $("m-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const name = $("m-name").value.trim();
     if (!name) { say("m-status-line", "Give the bird a name.", "err"); return; }
     if (!token) {
+      if (sheet) { keepDraft = true; closeSheet(); }
       $("m-key-box").open = true;
-      say("m-key-status", "Add your GitHub key first, then tap Save bird again.", "err");
+      say("m-key-status", sheet
+        ? "Add your GitHub key here first. The bird form opens again once the key is saved, with what you typed."
+        : "Add your GitHub key first, then tap Save bird again.", "err");
       $("m-key-box").scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
@@ -335,7 +366,8 @@
       renderList();
       window.HostFlock && window.HostFlock.setBirds(flock);
       resetForm();
-      say("m-status-line", `Saved ${bird.name}. The live site shows it in about a minute.`, "ok");
+      closeSheet();
+      say(sheet ? "m-done" : "m-status-line", `Saved ${bird.name}. The live site shows it in about a minute.`, "ok");
     } catch (err) {
       say("m-status-line", err.message, "err");
     } finally {
@@ -346,8 +378,9 @@
   async function removeBird(b, btn) {
     if (btn.dataset.armed !== "1") {
       btn.dataset.armed = "1";
+      const label = btn.textContent;
       btn.textContent = "Tap again to remove";
-      setTimeout(() => { btn.dataset.armed = ""; btn.textContent = "Remove"; }, 4000);
+      setTimeout(() => { btn.dataset.armed = ""; btn.textContent = label; }, 4000);
       return;
     }
     btn.disabled = true;
@@ -368,8 +401,10 @@
       flock = next;
       renderList();
       window.HostFlock && window.HostFlock.setBirds(flock);
-      if ($("m-id").value === b.id) resetForm();
-      say("m-status-line", `Removed ${b.name}. The live site updates in about a minute.`, "ok");
+      btn.disabled = false;
+      btn.dataset.armed = "";
+      if ($("m-id").value === b.id) { resetForm(); closeSheet(); }
+      say(sheet ? "m-done" : "m-status-line", `Removed ${b.name}. The live site updates in about a minute.`, "ok");
     } catch (err) {
       btn.disabled = false;
       say("m-status-line", err.message, "err");
@@ -377,8 +412,34 @@
   }
 
   // ---------- List ----------
+  function priceText(b) {
+    return typeof b.price === "number" && b.price > 0 ? `${cfg.currency || "₹"}${b.price.toLocaleString("en-IN")}` : "Price on request";
+  }
+  function el(tag, props = {}, ...kids) {
+    const n = Object.assign(document.createElement(tag), props);
+    n.append(...kids.filter((k) => k != null));
+    return n;
+  }
+  function renderTiles() {
+    const add = el("button", { type: "button", className: "tile add" }, el("span", {}, el("b", { textContent: "+" }), "Add a bird"));
+    add.addEventListener("click", () => openSheet(null));
+    $("m-list").replaceChildren(el("li", {}, add), ...flock.map((b) => {
+      const status = typeof b.available === "boolean"
+        ? el("span", { className: "pill " + (b.available ? "sale" : "keep"), textContent: b.available ? "For sale" : "Not for sale" }) : null;
+      const tile = el("button", { type: "button", className: "tile" },
+        el("img", { src: b.photo, alt: "", loading: "lazy" }),
+        el("span", {}, b.name, " ",
+          b.nameTe ? el("small", { lang: "te", textContent: b.nameTe }) : null,
+          el("small", {}, priceText(b), status)));
+      tile.setAttribute("aria-label", `Edit ${b.name}`);
+      tile.addEventListener("click", () => openSheet(b));
+      return el("li", {}, tile);
+    }));
+  }
+
   function renderList() {
     $("m-count").textContent = flock.length ? `${flock.length} birds` : "";
+    if (sheet) return renderTiles();
     $("m-list").replaceChildren(...flock.map((b) => {
       const li = document.createElement("li");
       const img = Object.assign(document.createElement("img"), { src: b.photo, alt: "" });
@@ -397,6 +458,7 @@
 
   renderKey();
   renderVarieties();
+  renderList();
   fetch(FLOCK, { cache: "no-cache" })
     .then((r) => r.json())
     .then((list) => { flock = list; renderList(); })
