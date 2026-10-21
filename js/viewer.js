@@ -291,8 +291,9 @@
   $("photo-view").addEventListener("click", (e) => { if (e.target === $("photo-view")) $("photo-view").close(); });
 
   // ---------- Password gate ----------
-  // The whole page stays covered until a live camera or the host confirms
-  // the password. Nothing on this page can check it by itself.
+  // Only the live area (video, farm photos, chat) is locked. The flock,
+  // compare and schedule sections are open to everyone. The video stays
+  // covered until a live camera or the host confirms the password.
   function gateNote(text) {
     $("gate-note").textContent = text || "";
     $("gate-note").hidden = !text;
@@ -305,7 +306,8 @@
     $("gate-form").classList.remove("checking");
     $("gate").hidden = false;
     $("gate-pass").value = "";
-    setTimeout(() => $("gate-pass").focus(), 50);
+    // Focus only after a mistake, so the keyboard doesn't pop up on arrival.
+    if (error) setTimeout(() => $("gate-pass").focus({ preventScroll: true }), 50);
   }
 
   function checking() {
@@ -325,7 +327,7 @@
     clearTimeout(waitTimer);
     session.set("viewer-pass", accessKey);
     $("gate").hidden = true;
-    document.documentElement.classList.add("unlocked");
+    $("photos-empty").textContent = "Photos shared from the farm cameras will appear here.";
   }
 
   // A camera or the host rejected our password: stop everything and ask again.
@@ -334,7 +336,6 @@
     accessKey = "";
     verified = false;
     clearTimeout(waitTimer);
-    document.documentElement.classList.remove("unlocked");
     session.set("viewer-pass", "");
     for (const cam of cams.values()) { clearTimeout(cam.retry); cam.conn = null; cam.online = false; }
     clearTimeout(hubRetry);

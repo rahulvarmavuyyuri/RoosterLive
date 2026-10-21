@@ -180,16 +180,16 @@ html[data-bg]:not([data-bg="none"]) .sign p { text-shadow: 0 1px 0 var(--panel);
 html[data-bg]:not([data-bg="none"]) .bird { background: color-mix(in srgb, var(--panel) 88%, transparent); padding: 14px; border-radius: 8px; }
 html[data-bg]:not([data-bg="none"]) .day { background: color-mix(in srgb, var(--panel) 88%, transparent); padding: 0 14px; border-radius: 0 0 8px 8px; }
 
-/* ---------- Password gate (viewer page) ---------- */
-.gate { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; background: var(--bg); overflow-y: auto; }
-/* Nothing on the viewer page shows until the farm accepts the password. */
-html:not(.unlocked) body:has(#gate) > :not(#gate):not(script) { visibility: hidden; }
-.gate-note { color: var(--muted); font-weight: 700; }
-.gate-form.checking input, .gate-card.checking input { opacity: 0.6; }
-.gate-card { width: min(420px, 100%); background: var(--panel); border: 2px solid var(--ink); border-radius: 12px; padding: 24px; display: grid; gap: 12px; box-shadow: 0 12px 40px rgb(0 0 0 / .2); }
-.gate-card h2 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 2rem; line-height: 1.1; color: var(--comb); }
-.gate-card p { margin: 0; }
+/* ---------- Password gate: covers only the live video (viewer page) ---------- */
+.screen .gate { position: absolute; inset: 0; z-index: 4; display: grid; place-items: center; padding: 14px; background: #1f2a1a; overflow-y: auto; }
+.screen:has(.gate:not([hidden])) { aspect-ratio: auto; min-height: 330px; max-height: none; }
+@media (min-width: 900px) { .screen:has(.gate:not([hidden])) { min-height: 0; aspect-ratio: 16 / 9; } }
+.gate-card { width: min(380px, 100%); background: var(--panel); border: 2px solid var(--ink); border-radius: 12px; padding: 18px; display: grid; gap: 10px; box-shadow: 0 12px 40px rgb(0 0 0 / .3); }
+.gate-card h2 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 1.45rem; line-height: 1.15; color: var(--comb); }
+.gate-card p { margin: 0; font-size: 0.9rem; }
 .gate-card input { width: 100%; font: inherit; color: var(--ink); background: var(--bg); border: 2px solid var(--muted); border-radius: 6px; padding: 10px 12px; }
+.gate-note { color: var(--muted); font-weight: 700; }
+.gate-card.checking input { opacity: 0.6; }
 .gate-error { color: var(--comb); font-weight: 700; }
 
 /* Telugu names next to the English ones */

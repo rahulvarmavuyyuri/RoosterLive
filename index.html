@@ -12,18 +12,6 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="gate" id="gate">
-    <form class="gate-card" id="gate-form" autocomplete="off">
-      <h2>Friends only</h2>
-      <p>Enter the password the farm shared with you to watch the roosters live.</p>
-      <label class="visually-hidden" for="gate-pass">Password</label>
-      <input type="password" id="gate-pass" placeholder="Password" required minlength="4" autocomplete="current-password">
-      <p class="gate-error" id="gate-error" role="alert" hidden></p>
-      <p class="gate-note" id="gate-note" role="status" hidden></p>
-      <button class="btn primary" type="submit">Watch live</button>
-    </form>
-  </div>
-
   <header class="sign">
     <div class="wrap">
       <h1 data-site-name>RoosterLive</h1>
@@ -48,6 +36,17 @@
             </div>
           </div>
           <div class="caption" id="caption" hidden></div>
+          <div class="gate" id="gate">
+            <form class="gate-card" id="gate-form" autocomplete="off">
+              <h2>Live stream: friends only</h2>
+              <p>Enter the farm's password to watch live, see farm photos and chat.</p>
+              <label class="visually-hidden" for="gate-pass">Password</label>
+              <input type="password" id="gate-pass" placeholder="Password" required minlength="4" autocomplete="current-password">
+              <p class="gate-error" id="gate-error" role="alert" hidden></p>
+              <p class="gate-note" id="gate-note" role="status" hidden></p>
+              <button class="btn primary" type="submit">Watch live</button>
+            </form>
+          </div>
           <div class="screen-controls">
             <button class="btn small" id="unmute" type="button" hidden>Turn sound on</button>
             <button class="btn small" id="fullscreen" type="button">Full screen</button>
@@ -62,7 +61,7 @@
             <span class="meta">Tap to enlarge</span>
           </header>
           <ul class="photo-grid side-photos" id="photo-grid"></ul>
-          <p class="spot-empty" id="photos-empty">Photos shared from the farm cameras will appear here.</p>
+          <p class="spot-empty" id="photos-empty">Enter the password on the video to see photos from the farm.</p>
         </section>
 
         <section class="panel chat" aria-labelledby="chat-title" hidden>
