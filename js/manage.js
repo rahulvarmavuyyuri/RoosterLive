@@ -13,6 +13,7 @@
   try { token = localStorage.getItem(KEY) || ""; } catch { /* ignore */ }
   let flock = [];
   let photoData = null; // base64 JPEG (no prefix) of a newly chosen photo
+  let uploadedPath = null; // where photoData was already saved, if it was
 
   function say(id, text, kind) {
     const el = $(id);
@@ -29,6 +30,7 @@
     let res;
     try {
       res = await fetch(api(path), {
+        cache: "no-store",
         ...opts,
         headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json", ...(opts.headers || {}) },
       });
@@ -113,6 +115,7 @@
       c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
       const dataUrl = c.toDataURL("image/jpeg", 0.82); // re-encoding also drops hidden photo data
       photoData = dataUrl.split(",")[1];
+      uploadedPath = null;
       $("m-photo-preview").src = dataUrl;
       $("m-photo-preview").hidden = false;
       URL.revokeObjectURL(url);
@@ -166,6 +169,7 @@
     [...$("m-varieties").children].forEach((c) => c.setAttribute("aria-pressed", "false"));
     $("m-id").value = "";
     photoData = null;
+    uploadedPath = null;
     $("m-photo-preview").hidden = true;
     $("m-form-title").textContent = "Add a bird";
     $("m-save").textContent = "Save bird";
@@ -203,29 +207,42 @@
     $("m-save").disabled = true;
     say("m-status-line", "Saving to your site…");
     try {
-      const { sha, list } = await readFlock();
-      flock = list;
-      const old = editing ? list.find((b) => b.id === editing) : null;
-      const bird = old ? { ...old } : { id: slug(name) };
-      for (const [k, id] of Object.entries(fields)) {
-        const v = $(id).value.trim();
-        if (v) bird[k] = v; else delete bird[k];
-      }
-      const price = Number($("m-price").value);
-      bird.price = $("m-price").value !== "" && price > 0 ? Math.round(price) : null;
-      const st = $("m-status").value;
-      if (st === "none") delete bird.available; else bird.available = st === "sale";
+      // If the list changed on GitHub meanwhile, re-read it and save again (up to 3 tries).
+      let next, bird, old;
+      for (let attempt = 1; ; attempt++) {
+        const { sha, list } = await readFlock();
+        flock = list;
+        old = editing ? list.find((b) => b.id === editing) : null;
+        bird = old ? { ...old } : { id: slug(name) };
+        for (const [k, id] of Object.entries(fields)) {
+          const v = $(id).value.trim();
+          if (v) bird[k] = v; else delete bird[k];
+        }
+        const price = Number($("m-price").value);
+        bird.price = $("m-price").value !== "" && price > 0 ? Math.round(price) : null;
+        const st = $("m-status").value;
+        if (st === "none") delete bird.available; else bird.available = st === "sale";
 
-      if (photoData) {
-        const path = `images/flock/${bird.id}-${Date.now().toString(36)}.jpg`;
-        say("m-status-line", "Uploading the photo…");
-        await writeFile(path, photoData, `Host page: photo for ${bird.name}`);
-        bird.photo = path;
-      }
+        if (photoData) {
+          if (!uploadedPath) {
+            const path = `images/flock/${bird.id}-${Date.now().toString(36)}.jpg`;
+            say("m-status-line", "Uploading the photo…");
+            await writeFile(path, photoData, `Host page: photo for ${bird.name}`);
+            uploadedPath = path;
+          }
+          bird.photo = uploadedPath;
+        }
 
-      const next = old ? list.map((b) => (b.id === bird.id ? bird : b)) : [...list, bird];
-      say("m-status-line", "Updating Meet the flock…");
-      await writeFile(FLOCK, toB64(JSON.stringify(next, null, 2) + "\n"), `Host page: ${old ? "update" : "add"} ${bird.name}`, sha);
+        next = old ? list.map((b) => (b.id === bird.id ? bird : b)) : [...list, bird];
+        say("m-status-line", "Updating Meet the flock…");
+        try {
+          await writeFile(FLOCK, toB64(JSON.stringify(next, null, 2) + "\n"), `Host page: ${old ? "update" : "add"} ${bird.name}`, sha);
+          break;
+        } catch (err) {
+          if (attempt >= 3 || !/changed while saving/.test(err.message)) throw err;
+          await new Promise((r) => setTimeout(r, 1200));
+        }
+      }
       flock = next;
       renderList();
       window.HostFlock && window.HostFlock.setBirds(flock);
@@ -248,9 +265,18 @@
     btn.disabled = true;
     say("m-status-line", `Removing ${b.name}…`);
     try {
-      const { sha, list } = await readFlock();
-      const next = list.filter((x) => x.id !== b.id);
-      await writeFile(FLOCK, toB64(JSON.stringify(next, null, 2) + "\n"), `Host page: remove ${b.name}`, sha);
+      let next;
+      for (let attempt = 1; ; attempt++) {
+        const { sha, list } = await readFlock();
+        next = list.filter((x) => x.id !== b.id);
+        try {
+          await writeFile(FLOCK, toB64(JSON.stringify(next, null, 2) + "\n"), `Host page: remove ${b.name}`, sha);
+          break;
+        } catch (err) {
+          if (attempt >= 3 || !/changed while saving/.test(err.message)) throw err;
+          await new Promise((r) => setTimeout(r, 1200));
+        }
+      }
       flock = next;
       renderList();
       window.HostFlock && window.HostFlock.setBirds(flock);
