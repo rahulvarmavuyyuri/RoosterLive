@@ -339,9 +339,11 @@
     return c.toDataURL("image/jpeg", 0.8);
   }
 
+  const captionNow = () => $("share-caption").value.replace(/\s+/g, " ").trim().slice(0, 80);
+  const newPhoto = (src, caption) => ({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), src, caption, ts: Date.now() });
+
   function addShared(src) {
-    const caption = $("share-caption").value.replace(/\s+/g, " ").trim().slice(0, 80);
-    shared.unshift({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), src, caption, ts: Date.now() });
+    shared.unshift(newPhoto(src, captionNow()));
     shared.length = Math.min(shared.length, MAX_SHARED);
     $("share-caption").value = "";
     sendPhotos();
@@ -372,16 +374,41 @@
     addShared(toJpeg(preview, preview.videoWidth, preview.videoHeight));
   });
 
-  $("share-file").addEventListener("change", (e) => {
-    const file = e.target.files && e.target.files[0];
+  // Choose one or many photos from the phone. The caption, if any, goes on each.
+  function loadImage(file) {
+    return new Promise((resolve) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => { const src = toJpeg(img, img.naturalWidth, img.naturalHeight); URL.revokeObjectURL(url); resolve(src); };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+      img.src = url;
+    });
+  }
+
+  $("share-file").addEventListener("change", async (e) => {
+    const files = [...(e.target.files || [])].filter((f) => f.type.startsWith("image/"));
+    const skippedType = (e.target.files ? e.target.files.length : 0) - files.length;
     e.target.value = "";
-    if (!file) return;
-    if (!file.type.startsWith("image/")) { shareStatus("That file isn't a photo.", "err"); return; }
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => { addShared(toJpeg(img, img.naturalWidth, img.naturalHeight)); URL.revokeObjectURL(url); };
-    img.onerror = () => { shareStatus("Couldn't open that photo. Try a JPG or PNG.", "err"); URL.revokeObjectURL(url); };
-    img.src = url;
+    if (!files.length) { if (skippedType) shareStatus("That file isn't a photo.", "err"); return; }
+    const picked = files.slice(0, MAX_SHARED);
+    const caption = captionNow();
+    shareStatus(picked.length > 1 ? `Adding ${picked.length} photos…` : "Adding the photo…");
+    const added = [];
+    for (const f of picked) {
+      const src = await loadImage(f);
+      if (src) added.push(newPhoto(src, caption));
+    }
+    if (!added.length) { shareStatus("Couldn't open those photos. Try JPG or PNG photos.", "err"); return; }
+    shared.unshift(...added);
+    const dropped = Math.max(0, shared.length - MAX_SHARED);
+    shared.length = Math.min(shared.length, MAX_SHARED);
+    $("share-caption").value = "";
+    sendPhotos();
+    const n = added.length;
+    let msg = (peer ? `Shared ${n} photo${n > 1 ? "s" : ""} with viewers.` : `Added ${n} photo${n > 1 ? "s" : ""}. You can go live now.`);
+    if (files.length > MAX_SHARED || dropped) msg += ` Up to ${MAX_SHARED} photos are kept; the oldest were left out.`;
+    if (n < picked.length) msg += ` ${picked.length - n} couldn't be opened.`;
+    shareStatus(msg, "ok");
   });
 
   startBtn.addEventListener("click", start);
