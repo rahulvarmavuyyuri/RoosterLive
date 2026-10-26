@@ -99,10 +99,58 @@
     micBtn.textContent = micOn ? "Mute sound" : "Turn sound on";
   }
 
+  // Show the camera on this phone and make sure it really plays. Some phones
+  // leave the video black until play() is called, and some pick a rear lens
+  // (depth or infrared) that sends no picture.
+  let checkTimer = null;
+  function showPreview(s) {
+    preview.srcObject = s;
+    const p = preview.play && preview.play();
+    if (p && p.catch) p.catch(() => {});
+    clearTimeout(checkTimer);
+    checkTimer = setTimeout(checkPicture, 3000);
+  }
+  preview.addEventListener("click", () => { if (stream) preview.play().catch(() => {}); });
+
+  function brightness() {
+    try {
+      const c = document.createElement("canvas");
+      c.width = 32; c.height = 18;
+      const g = c.getContext("2d", { willReadFrequently: true });
+      g.drawImage(preview, 0, 0, 32, 18);
+      const d = g.getImageData(0, 0, 32, 18).data;
+      let sum = 0;
+      for (let i = 0; i < d.length; i += 4) sum += d[i] + d[i + 1] + d[i + 2];
+      return sum / (d.length / 4) / 3;
+    } catch { return null; }
+  }
+
+  let triedCams = new Set();
+  async function checkPicture() {
+    if (!stream) return;
+    const track = stream.getVideoTracks()[0];
+    const noFrames = !preview.videoWidth || !track || track.readyState !== "live" || track.muted;
+    const light = noFrames ? 0 : brightness();
+    if (!noFrames && (light === null || light > 6)) return; // picture is fine
+    // Try the next camera on this phone automatically when this one sends nothing.
+    const cams = [...deviceSel.options].map((o) => o.value).filter(Boolean);
+    const cur = track && track.getSettings().deviceId;
+    if (cur) triedCams.add(cur);
+    const next = noFrames && cams.find((id) => !triedCams.has(id));
+    if (next) {
+      status("This camera isn't sending a picture. Trying another camera on this phone…", "err");
+      try { await swapStream(await openCamera(next)); deviceSel.value = next; return; } catch { /* fall through */ }
+    }
+    status(noFrames
+      ? "No picture from the camera. Close other apps using the camera, then tap Stop and Go live again. Or pick another camera in the Camera list."
+      : "The picture is completely dark. Check nothing covers the lens, or pick another camera in the Camera list.", "err");
+    deviceSel.disabled = cams.length < 2;
+  }
+
   async function swapStream(next) {
     const old = stream;
     stream = next;
-    preview.srcObject = stream;
+    showPreview(stream);
     applyMic();
     for (const v of viewers.values()) {
       const pc = v.call && v.call.peerConnection;
@@ -216,7 +264,8 @@
         : "Couldn't open the camera: " + err.message, "err");
       return;
     }
-    preview.srcObject = stream;
+    triedCams = new Set();
+    showPreview(stream);
     $("overlay").hidden = true;
     micOn = true;
     applyMic();
@@ -252,6 +301,7 @@
     if (peer) { peer.destroy(); peer = null; }
     if (stream) { stream.getTracks().forEach((t) => t.stop()); stream = null; }
     if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
+    clearTimeout(checkTimer);
     preview.srcObject = null;
     $("overlay").hidden = false;
     $("viewer-badge").hidden = true;
